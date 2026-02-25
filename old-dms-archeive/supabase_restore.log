@@ -1,0 +1,1232 @@
+SET
+SET
+SET
+psql:db_cluster-08-09-2025@05-22-24.backup:16: ERROR:  role "anon" already exists
+psql:db_cluster-08-09-2025@05-22-24.backup:17: ERROR:  "anon" is a reserved role, only superusers can modify it
+psql:db_cluster-08-09-2025@05-22-24.backup:18: ERROR:  role "authenticated" already exists
+psql:db_cluster-08-09-2025@05-22-24.backup:19: ERROR:  "authenticated" is a reserved role, only superusers can modify it
+psql:db_cluster-08-09-2025@05-22-24.backup:20: ERROR:  role "authenticator" already exists
+psql:db_cluster-08-09-2025@05-22-24.backup:21: ERROR:  "authenticator" is a reserved role, only superusers can modify it
+psql:db_cluster-08-09-2025@05-22-24.backup:22: ERROR:  role "dashboard_user" already exists
+psql:db_cluster-08-09-2025@05-22-24.backup:23: ERROR:  "dashboard_user" is a reserved role, only superusers can modify it
+psql:db_cluster-08-09-2025@05-22-24.backup:24: ERROR:  role "pgbouncer" already exists
+psql:db_cluster-08-09-2025@05-22-24.backup:25: ERROR:  "pgbouncer" is a reserved role, only superusers can modify it
+psql:db_cluster-08-09-2025@05-22-24.backup:26: ERROR:  role "postgres" already exists
+psql:db_cluster-08-09-2025@05-22-24.backup:27: ERROR:  permission denied to alter role
+DETAIL:  Only superusers can alter privileged roles.
+psql:db_cluster-08-09-2025@05-22-24.backup:28: ERROR:  role "service_role" already exists
+psql:db_cluster-08-09-2025@05-22-24.backup:29: ERROR:  "service_role" is a reserved role, only superusers can modify it
+psql:db_cluster-08-09-2025@05-22-24.backup:30: ERROR:  role "supabase_admin" already exists
+psql:db_cluster-08-09-2025@05-22-24.backup:31: ERROR:  "supabase_admin" is a reserved role, only superusers can modify it
+psql:db_cluster-08-09-2025@05-22-24.backup:32: ERROR:  role "supabase_auth_admin" already exists
+psql:db_cluster-08-09-2025@05-22-24.backup:33: ERROR:  "supabase_auth_admin" is a reserved role, only superusers can modify it
+psql:db_cluster-08-09-2025@05-22-24.backup:34: ERROR:  role "supabase_etl_admin" already exists
+psql:db_cluster-08-09-2025@05-22-24.backup:35: ERROR:  "supabase_etl_admin" is a reserved role, only superusers can modify it
+psql:db_cluster-08-09-2025@05-22-24.backup:36: ERROR:  role "supabase_read_only_user" already exists
+psql:db_cluster-08-09-2025@05-22-24.backup:37: ERROR:  "supabase_read_only_user" is a reserved role, only superusers can modify it
+psql:db_cluster-08-09-2025@05-22-24.backup:38: ERROR:  role "supabase_realtime_admin" already exists
+psql:db_cluster-08-09-2025@05-22-24.backup:39: ERROR:  "supabase_realtime_admin" is a reserved role, only superusers can modify it
+psql:db_cluster-08-09-2025@05-22-24.backup:40: ERROR:  role "supabase_replication_admin" already exists
+psql:db_cluster-08-09-2025@05-22-24.backup:41: ERROR:  "supabase_replication_admin" is a reserved role, only superusers can modify it
+psql:db_cluster-08-09-2025@05-22-24.backup:42: ERROR:  role "supabase_storage_admin" already exists
+psql:db_cluster-08-09-2025@05-22-24.backup:43: ERROR:  "supabase_storage_admin" is a reserved role, only superusers can modify it
+ALTER ROLE
+ALTER ROLE
+psql:db_cluster-08-09-2025@05-22-24.backup:65: ERROR:  permission denied to set parameter "session_preload_libraries"
+ALTER ROLE
+ALTER ROLE
+ALTER ROLE
+psql:db_cluster-08-09-2025@05-22-24.backup:79: ERROR:  "supabase_admin" is a reserved role, only superusers can modify it
+psql:db_cluster-08-09-2025@05-22-24.backup:80: ERROR:  "supabase_admin" is a reserved role, only superusers can modify it
+psql:db_cluster-08-09-2025@05-22-24.backup:86: ERROR:  "supabase_auth_admin" is a reserved role, only superusers can modify it
+psql:db_cluster-08-09-2025@05-22-24.backup:87: ERROR:  "supabase_auth_admin" is a reserved role, only superusers can modify it
+psql:db_cluster-08-09-2025@05-22-24.backup:88: ERROR:  "supabase_auth_admin" is a reserved role, only superusers can modify it
+psql:db_cluster-08-09-2025@05-22-24.backup:94: ERROR:  "supabase_read_only_user" is a reserved role, only superusers can modify it
+psql:db_cluster-08-09-2025@05-22-24.backup:100: ERROR:  "supabase_storage_admin" is a reserved role, only superusers can modify it
+psql:db_cluster-08-09-2025@05-22-24.backup:101: ERROR:  "supabase_storage_admin" is a reserved role, only superusers can modify it
+psql:db_cluster-08-09-2025@05-22-24.backup:108: ERROR:  permission denied to grant privileges as role "supabase_admin"
+DETAIL:  Only roles with privileges of role "supabase_admin" may grant privileges as this role.
+psql:db_cluster-08-09-2025@05-22-24.backup:109: ERROR:  permission denied to grant privileges as role "supabase_admin"
+DETAIL:  Only roles with privileges of role "supabase_admin" may grant privileges as this role.
+psql:db_cluster-08-09-2025@05-22-24.backup:110: ERROR:  permission denied to grant privileges as role "supabase_admin"
+DETAIL:  Only roles with privileges of role "supabase_admin" may grant privileges as this role.
+psql:db_cluster-08-09-2025@05-22-24.backup:111: ERROR:  permission denied to grant privileges as role "supabase_admin"
+DETAIL:  Only roles with privileges of role "supabase_admin" may grant privileges as this role.
+psql:db_cluster-08-09-2025@05-22-24.backup:112: ERROR:  "authenticator" role memberships are reserved, only superusers can grant them
+psql:db_cluster-08-09-2025@05-22-24.backup:113: ERROR:  "authenticator" role memberships are reserved, only superusers can grant them
+psql:db_cluster-08-09-2025@05-22-24.backup:114: ERROR:  permission denied to grant privileges as role "supabase_admin"
+DETAIL:  Only roles with privileges of role "supabase_admin" may grant privileges as this role.
+psql:db_cluster-08-09-2025@05-22-24.backup:115: ERROR:  permission denied to grant privileges as role "supabase_admin"
+DETAIL:  Only roles with privileges of role "supabase_admin" may grant privileges as this role.
+psql:db_cluster-08-09-2025@05-22-24.backup:116: ERROR:  permission denied to grant privileges as role "supabase_admin"
+DETAIL:  Only roles with privileges of role "supabase_admin" may grant privileges as this role.
+psql:db_cluster-08-09-2025@05-22-24.backup:117: ERROR:  "supabase_etl_admin" is a reserved role, only superusers can modify it
+psql:db_cluster-08-09-2025@05-22-24.backup:118: ERROR:  "supabase_read_only_user" is a reserved role, only superusers can modify it
+psql:db_cluster-08-09-2025@05-22-24.backup:119: ERROR:  permission denied to grant privileges as role "supabase_admin"
+DETAIL:  Only roles with privileges of role "supabase_admin" may grant privileges as this role.
+psql:db_cluster-08-09-2025@05-22-24.backup:120: ERROR:  permission denied to grant privileges as role "supabase_admin"
+DETAIL:  Only roles with privileges of role "supabase_admin" may grant privileges as this role.
+psql:db_cluster-08-09-2025@05-22-24.backup:121: ERROR:  permission denied to grant privileges as role "supabase_admin"
+DETAIL:  Only roles with privileges of role "supabase_admin" may grant privileges as this role.
+psql:db_cluster-08-09-2025@05-22-24.backup:122: ERROR:  "supabase_realtime_admin" role memberships are reserved, only superusers can grant them
+You are now connected to database "template1" as user "postgres.fxlcvuszizhqjjhyunvk".
+SET
+SET
+SET
+SET
+SET
+SET
+ set_config 
+------------
+ 
+(1 row)
+
+SET
+SET
+SET
+SET
+You are now connected to database "postgres" as user "postgres.fxlcvuszizhqjjhyunvk".
+SET
+SET
+SET
+SET
+SET
+SET
+ set_config 
+------------
+ 
+(1 row)
+
+SET
+SET
+SET
+SET
+psql:db_cluster-08-09-2025@05-22-24.backup:199: ERROR:  schema "auth" already exists
+ALTER SCHEMA
+psql:db_cluster-08-09-2025@05-22-24.backup:208: ERROR:  schema "extensions" already exists
+ALTER SCHEMA
+psql:db_cluster-08-09-2025@05-22-24.backup:217: ERROR:  schema "graphql" already exists
+ALTER SCHEMA
+psql:db_cluster-08-09-2025@05-22-24.backup:226: ERROR:  schema "graphql_public" already exists
+ALTER SCHEMA
+psql:db_cluster-08-09-2025@05-22-24.backup:235: ERROR:  schema "pgbouncer" already exists
+ALTER SCHEMA
+psql:db_cluster-08-09-2025@05-22-24.backup:244: ERROR:  schema "realtime" already exists
+ALTER SCHEMA
+psql:db_cluster-08-09-2025@05-22-24.backup:253: ERROR:  schema "storage" already exists
+ALTER SCHEMA
+psql:db_cluster-08-09-2025@05-22-24.backup:262: ERROR:  schema "vault" already exists
+ALTER SCHEMA
+CREATE EXTENSION
+COMMENT
+CREATE EXTENSION
+COMMENT
+CREATE EXTENSION
+COMMENT
+CREATE EXTENSION
+COMMENT
+CREATE EXTENSION
+COMMENT
+psql:db_cluster-08-09-2025@05-22-24.backup:345: ERROR:  permission denied for schema auth
+ALTER TYPE
+psql:db_cluster-08-09-2025@05-22-24.backup:357: ERROR:  permission denied for schema auth
+ALTER TYPE
+psql:db_cluster-08-09-2025@05-22-24.backup:369: ERROR:  permission denied for schema auth
+ALTER TYPE
+psql:db_cluster-08-09-2025@05-22-24.backup:382: ERROR:  permission denied for schema auth
+ALTER TYPE
+psql:db_cluster-08-09-2025@05-22-24.backup:394: ERROR:  permission denied for schema auth
+ALTER TYPE
+psql:db_cluster-08-09-2025@05-22-24.backup:410: ERROR:  permission denied for schema auth
+ALTER TYPE
+psql:db_cluster-08-09-2025@05-22-24.backup:425: ERROR:  type "action" already exists
+ALTER TYPE
+psql:db_cluster-08-09-2025@05-22-24.backup:442: ERROR:  type "equality_op" already exists
+ALTER TYPE
+psql:db_cluster-08-09-2025@05-22-24.backup:455: ERROR:  type "user_defined_filter" already exists
+ALTER TYPE
+psql:db_cluster-08-09-2025@05-22-24.backup:471: ERROR:  type "wal_column" already exists
+ALTER TYPE
+psql:db_cluster-08-09-2025@05-22-24.backup:485: ERROR:  type "wal_rls" already exists
+ALTER TYPE
+psql:db_cluster-08-09-2025@05-22-24.backup:497: ERROR:  permission denied for schema storage
+ALTER TYPE
+psql:db_cluster-08-09-2025@05-22-24.backup:514: ERROR:  permission denied for schema auth
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:523: ERROR:  must be owner of function auth.email
+psql:db_cluster-08-09-2025@05-22-24.backup:538: ERROR:  permission denied for schema auth
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:555: ERROR:  permission denied for schema auth
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:564: ERROR:  must be owner of function auth.role
+psql:db_cluster-08-09-2025@05-22-24.backup:579: ERROR:  permission denied for schema auth
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:588: ERROR:  must be owner of function auth.uid
+psql:db_cluster-08-09-2025@05-22-24.backup:625: ERROR:  function "grant_pg_cron_access" already exists with same argument types
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:634: ERROR:  must be owner of function extensions.grant_pg_cron_access
+psql:db_cluster-08-09-2025@05-22-24.backup:692: ERROR:  function "grant_pg_graphql_access" already exists with same argument types
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:701: ERROR:  must be owner of function extensions.grant_pg_graphql_access
+psql:db_cluster-08-09-2025@05-22-24.backup:752: ERROR:  function "grant_pg_net_access" already exists with same argument types
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:761: ERROR:  must be owner of function extensions.grant_pg_net_access
+psql:db_cluster-08-09-2025@05-22-24.backup:794: ERROR:  function "pgrst_ddl_watch" already exists with same argument types
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:827: ERROR:  function "pgrst_drop_watch" already exists with same argument types
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:886: ERROR:  function "set_graphql_placeholder" already exists with same argument types
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:895: ERROR:  must be owner of function extensions.set_graphql_placeholder
+psql:db_cluster-08-09-2025@05-22-24.backup:918: ERROR:  permission denied for schema pgbouncer
+ALTER FUNCTION
+SET
+SET
+CREATE TABLE
+ALTER TABLE
+CREATE FUNCTION
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:1260: ERROR:  function "apply_rls" already exists with same argument types
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:1291: ERROR:  function "broadcast_changes" already exists with same argument types
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:1326: ERROR:  function "build_prepared_statement_sql" already exists with same argument types
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:1344: ERROR:  function "cast" already exists with same argument types
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:1385: ERROR:  function "check_equality_op" already exists with same argument types
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:1423: ERROR:  function "is_visible_through_filters" already exists with same argument types
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:1491: ERROR:  permission denied to set parameter "log_min_messages"
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:1531: ERROR:  function "quote_wal2json" already exists with same argument types
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:1557: ERROR:  function "send" already exists with same argument types
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:1633: ERROR:  function "subscription_check_filters" already exists with same argument types
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:1644: ERROR:  function "to_regrole" already exists with same argument types
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:1657: ERROR:  function "topic" already exists with same argument types
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:1679: ERROR:  permission denied for schema storage
+psql:db_cluster-08-09-2025@05-22-24.backup:1682: ERROR:  function storage.add_prefixes(text, text) does not exist
+psql:db_cluster-08-09-2025@05-22-24.backup:1698: ERROR:  permission denied for schema storage
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:1736: ERROR:  permission denied for schema storage
+psql:db_cluster-08-09-2025@05-22-24.backup:1739: ERROR:  function storage.delete_prefix(text, text) does not exist
+psql:db_cluster-08-09-2025@05-22-24.backup:1759: ERROR:  permission denied for schema storage
+psql:db_cluster-08-09-2025@05-22-24.backup:1762: ERROR:  function storage.delete_prefix_hierarchy_trigger() does not exist
+psql:db_cluster-08-09-2025@05-22-24.backup:1777: ERROR:  permission denied for schema storage
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:1797: ERROR:  permission denied for schema storage
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:1815: ERROR:  permission denied for schema storage
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:1835: ERROR:  permission denied for schema storage
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:1848: ERROR:  permission denied for schema storage
+psql:db_cluster-08-09-2025@05-22-24.backup:1851: ERROR:  function storage.get_level(text) does not exist
+psql:db_cluster-08-09-2025@05-22-24.backup:1866: ERROR:  permission denied for schema storage
+psql:db_cluster-08-09-2025@05-22-24.backup:1869: ERROR:  function storage.get_prefix(text) does not exist
+psql:db_cluster-08-09-2025@05-22-24.backup:1895: ERROR:  permission denied for schema storage
+psql:db_cluster-08-09-2025@05-22-24.backup:1898: ERROR:  function storage.get_prefixes(text) does not exist
+psql:db_cluster-08-09-2025@05-22-24.backup:1913: ERROR:  permission denied for schema storage
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:1961: ERROR:  permission denied for schema storage
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:2007: ERROR:  permission denied for schema storage
+psql:db_cluster-08-09-2025@05-22-24.backup:2010: ERROR:  function storage.list_objects_with_delimiter(text, text, text, integer, text, text) does not exist
+psql:db_cluster-08-09-2025@05-22-24.backup:2025: ERROR:  permission denied for schema storage
+psql:db_cluster-08-09-2025@05-22-24.backup:2028: ERROR:  function storage.objects_insert_prefix_trigger() does not exist
+psql:db_cluster-08-09-2025@05-22-24.backup:2069: ERROR:  permission denied for schema storage
+psql:db_cluster-08-09-2025@05-22-24.backup:2072: ERROR:  function storage.objects_update_prefix_trigger() does not exist
+psql:db_cluster-08-09-2025@05-22-24.backup:2084: ERROR:  permission denied for schema storage
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:2100: ERROR:  permission denied for schema storage
+psql:db_cluster-08-09-2025@05-22-24.backup:2103: ERROR:  function storage.prefixes_insert_trigger() does not exist
+psql:db_cluster-08-09-2025@05-22-24.backup:2126: ERROR:  permission denied for schema storage
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:2197: ERROR:  permission denied for schema storage
+psql:db_cluster-08-09-2025@05-22-24.backup:2200: ERROR:  function storage.search_legacy_v1(text, text, integer, integer, integer, text, text, text) does not exist
+psql:db_cluster-08-09-2025@05-22-24.backup:2267: ERROR:  permission denied for schema storage
+psql:db_cluster-08-09-2025@05-22-24.backup:2270: ERROR:  function storage.search_v1_optimised(text, text, integer, integer, integer, text, text, text) does not exist
+psql:db_cluster-08-09-2025@05-22-24.backup:2316: ERROR:  permission denied for schema storage
+psql:db_cluster-08-09-2025@05-22-24.backup:2319: ERROR:  function storage.search_v2(text, text, integer, integer, text) does not exist
+psql:db_cluster-08-09-2025@05-22-24.backup:2332: ERROR:  permission denied for schema storage
+ALTER FUNCTION
+psql:db_cluster-08-09-2025@05-22-24.backup:2347: ERROR:  permission denied for schema auth
+LINE 1: CREATE TABLE auth.audit_log_entries (
+                     ^
+psql:db_cluster-08-09-2025@05-22-24.backup:2350: ERROR:  must be owner of table audit_log_entries
+psql:db_cluster-08-09-2025@05-22-24.backup:2356: ERROR:  must be owner of table audit_log_entries
+psql:db_cluster-08-09-2025@05-22-24.backup:2376: ERROR:  permission denied for schema auth
+LINE 1: CREATE TABLE auth.flow_state (
+                     ^
+psql:db_cluster-08-09-2025@05-22-24.backup:2379: ERROR:  must be owner of table flow_state
+psql:db_cluster-08-09-2025@05-22-24.backup:2385: ERROR:  must be owner of table flow_state
+psql:db_cluster-08-09-2025@05-22-24.backup:2402: ERROR:  permission denied for schema auth
+LINE 1: CREATE TABLE auth.identities (
+                     ^
+psql:db_cluster-08-09-2025@05-22-24.backup:2405: ERROR:  must be owner of table identities
+psql:db_cluster-08-09-2025@05-22-24.backup:2411: ERROR:  must be owner of table identities
+psql:db_cluster-08-09-2025@05-22-24.backup:2418: ERROR:  must be owner of relation identities
+psql:db_cluster-08-09-2025@05-22-24.backup:2431: ERROR:  permission denied for schema auth
+LINE 1: CREATE TABLE auth.instances (
+                     ^
+psql:db_cluster-08-09-2025@05-22-24.backup:2434: ERROR:  must be owner of table instances
+psql:db_cluster-08-09-2025@05-22-24.backup:2440: ERROR:  must be owner of table instances
+psql:db_cluster-08-09-2025@05-22-24.backup:2453: ERROR:  permission denied for schema auth
+LINE 1: CREATE TABLE auth.mfa_amr_claims (
+                     ^
+psql:db_cluster-08-09-2025@05-22-24.backup:2456: ERROR:  must be owner of table mfa_amr_claims
+psql:db_cluster-08-09-2025@05-22-24.backup:2462: ERROR:  must be owner of table mfa_amr_claims
+psql:db_cluster-08-09-2025@05-22-24.backup:2477: ERROR:  permission denied for schema auth
+LINE 1: CREATE TABLE auth.mfa_challenges (
+                     ^
+psql:db_cluster-08-09-2025@05-22-24.backup:2480: ERROR:  must be owner of table mfa_challenges
+psql:db_cluster-08-09-2025@05-22-24.backup:2486: ERROR:  must be owner of table mfa_challenges
+psql:db_cluster-08-09-2025@05-22-24.backup:2506: ERROR:  permission denied for schema auth
+LINE 1: CREATE TABLE auth.mfa_factors (
+                     ^
+psql:db_cluster-08-09-2025@05-22-24.backup:2509: ERROR:  must be owner of table mfa_factors
+psql:db_cluster-08-09-2025@05-22-24.backup:2515: ERROR:  must be owner of table mfa_factors
+psql:db_cluster-08-09-2025@05-22-24.backup:2538: ERROR:  permission denied for schema auth
+LINE 1: CREATE TABLE auth.oauth_clients (
+                     ^
+psql:db_cluster-08-09-2025@05-22-24.backup:2541: ERROR:  must be owner of table oauth_clients
+psql:db_cluster-08-09-2025@05-22-24.backup:2556: ERROR:  permission denied for schema auth
+LINE 1: CREATE TABLE auth.one_time_tokens (
+                     ^
+psql:db_cluster-08-09-2025@05-22-24.backup:2559: ERROR:  must be owner of table one_time_tokens
+psql:db_cluster-08-09-2025@05-22-24.backup:2575: ERROR:  permission denied for schema auth
+LINE 1: CREATE TABLE auth.refresh_tokens (
+                     ^
+psql:db_cluster-08-09-2025@05-22-24.backup:2578: ERROR:  must be owner of table refresh_tokens
+psql:db_cluster-08-09-2025@05-22-24.backup:2584: ERROR:  must be owner of table refresh_tokens
+psql:db_cluster-08-09-2025@05-22-24.backup:2596: ERROR:  permission denied for schema auth
+psql:db_cluster-08-09-2025@05-22-24.backup:2599: ERROR:  must be owner of sequence refresh_tokens_id_seq
+psql:db_cluster-08-09-2025@05-22-24.backup:2605: ERROR:  must be owner of sequence refresh_tokens_id_seq
+psql:db_cluster-08-09-2025@05-22-24.backup:2625: ERROR:  permission denied for schema auth
+LINE 1: CREATE TABLE auth.saml_providers (
+                     ^
+psql:db_cluster-08-09-2025@05-22-24.backup:2628: ERROR:  must be owner of table saml_providers
+psql:db_cluster-08-09-2025@05-22-24.backup:2634: ERROR:  must be owner of table saml_providers
+psql:db_cluster-08-09-2025@05-22-24.backup:2651: ERROR:  permission denied for schema auth
+LINE 1: CREATE TABLE auth.saml_relay_states (
+                     ^
+psql:db_cluster-08-09-2025@05-22-24.backup:2654: ERROR:  must be owner of table saml_relay_states
+psql:db_cluster-08-09-2025@05-22-24.backup:2660: ERROR:  must be owner of table saml_relay_states
+psql:db_cluster-08-09-2025@05-22-24.backup:2669: ERROR:  permission denied for schema auth
+LINE 1: CREATE TABLE auth.schema_migrations (
+                     ^
+psql:db_cluster-08-09-2025@05-22-24.backup:2672: ERROR:  must be owner of table schema_migrations
+psql:db_cluster-08-09-2025@05-22-24.backup:2678: ERROR:  must be owner of table schema_migrations
+psql:db_cluster-08-09-2025@05-22-24.backup:2697: ERROR:  permission denied for schema auth
+LINE 1: CREATE TABLE auth.sessions (
+                     ^
+psql:db_cluster-08-09-2025@05-22-24.backup:2700: ERROR:  must be owner of table sessions
+psql:db_cluster-08-09-2025@05-22-24.backup:2706: ERROR:  must be owner of table sessions
+psql:db_cluster-08-09-2025@05-22-24.backup:2713: ERROR:  must be owner of relation sessions
+psql:db_cluster-08-09-2025@05-22-24.backup:2727: ERROR:  permission denied for schema auth
+LINE 1: CREATE TABLE auth.sso_domains (
+                     ^
+psql:db_cluster-08-09-2025@05-22-24.backup:2730: ERROR:  must be owner of table sso_domains
+psql:db_cluster-08-09-2025@05-22-24.backup:2736: ERROR:  must be owner of table sso_domains
+psql:db_cluster-08-09-2025@05-22-24.backup:2750: ERROR:  permission denied for schema auth
+LINE 1: CREATE TABLE auth.sso_providers (
+                     ^
+psql:db_cluster-08-09-2025@05-22-24.backup:2753: ERROR:  must be owner of table sso_providers
+psql:db_cluster-08-09-2025@05-22-24.backup:2759: ERROR:  must be owner of table sso_providers
+psql:db_cluster-08-09-2025@05-22-24.backup:2766: ERROR:  must be owner of relation sso_providers
+psql:db_cluster-08-09-2025@05-22-24.backup:2810: ERROR:  permission denied for schema auth
+LINE 1: CREATE TABLE auth.users (
+                     ^
+psql:db_cluster-08-09-2025@05-22-24.backup:2813: ERROR:  must be owner of table users
+psql:db_cluster-08-09-2025@05-22-24.backup:2819: ERROR:  must be owner of table users
+psql:db_cluster-08-09-2025@05-22-24.backup:2826: ERROR:  must be owner of relation users
+CREATE TABLE
+ALTER TABLE
+CREATE TABLE
+ALTER TABLE
+CREATE TABLE
+ALTER TABLE
+psql:db_cluster-08-09-2025@05-22-24.backup:2888: ERROR:  relation "messages" already exists
+ALTER TABLE
+psql:db_cluster-08-09-2025@05-22-24.backup:2900: ERROR:  relation "schema_migrations" already exists
+psql:db_cluster-08-09-2025@05-22-24.backup:2903: ERROR:  must be owner of table schema_migrations
+psql:db_cluster-08-09-2025@05-22-24.backup:2917: ERROR:  relation "subscription" already exists
+psql:db_cluster-08-09-2025@05-22-24.backup:2920: ERROR:  must be owner of table subscription
+psql:db_cluster-08-09-2025@05-22-24.backup:2933: ERROR:  must be owner of table subscription
+psql:db_cluster-08-09-2025@05-22-24.backup:2952: ERROR:  permission denied for schema storage
+LINE 1: CREATE TABLE storage.buckets (
+                     ^
+psql:db_cluster-08-09-2025@05-22-24.backup:2955: ERROR:  must be owner of table buckets
+psql:db_cluster-08-09-2025@05-22-24.backup:2961: ERROR:  must be owner of relation buckets
+psql:db_cluster-08-09-2025@05-22-24.backup:2974: ERROR:  permission denied for schema storage
+LINE 1: CREATE TABLE storage.buckets_analytics (
+                     ^
+psql:db_cluster-08-09-2025@05-22-24.backup:2977: ERROR:  must be owner of table buckets_analytics
+psql:db_cluster-08-09-2025@05-22-24.backup:2988: ERROR:  permission denied for schema storage
+LINE 1: CREATE TABLE storage.migrations (
+                     ^
+psql:db_cluster-08-09-2025@05-22-24.backup:2991: ERROR:  must be owner of table migrations
+psql:db_cluster-08-09-2025@05-22-24.backup:3011: ERROR:  permission denied for schema storage
+LINE 1: CREATE TABLE storage.objects (
+                     ^
+psql:db_cluster-08-09-2025@05-22-24.backup:3014: ERROR:  must be owner of table objects
+psql:db_cluster-08-09-2025@05-22-24.backup:3020: ERROR:  must be owner of relation objects
+psql:db_cluster-08-09-2025@05-22-24.backup:3033: ERROR:  permission denied for schema storage
+LINE 1: CREATE TABLE storage.prefixes (
+                     ^
+psql:db_cluster-08-09-2025@05-22-24.backup:3036: ERROR:  relation "storage.prefixes" does not exist
+psql:db_cluster-08-09-2025@05-22-24.backup:3052: ERROR:  permission denied for schema storage
+LINE 1: CREATE TABLE storage.s3_multipart_uploads (
+                     ^
+psql:db_cluster-08-09-2025@05-22-24.backup:3055: ERROR:  must be owner of table s3_multipart_uploads
+psql:db_cluster-08-09-2025@05-22-24.backup:3072: ERROR:  permission denied for schema storage
+LINE 1: CREATE TABLE storage.s3_multipart_uploads_parts (
+                     ^
+psql:db_cluster-08-09-2025@05-22-24.backup:3075: ERROR:  must be owner of table s3_multipart_uploads_parts
+psql:db_cluster-08-09-2025@05-22-24.backup:3081: ERROR:  must be owner of table refresh_tokens
+COPY 93
+COPY 0
+psql:db_cluster-08-09-2025@05-22-24.backup:3200: ERROR:  insert or update on table "identities" violates foreign key constraint "identities_user_id_fkey"
+DETAIL:  Key (user_id)=(dd3746f5-b967-4579-8134-00c71152a76d) is not present in table "users".
+COPY 0
+psql:db_cluster-08-09-2025@05-22-24.backup:3231: ERROR:  insert or update on table "mfa_amr_claims" violates foreign key constraint "mfa_amr_claims_session_id_fkey"
+DETAIL:  Key (session_id)=(58c9cc12-f42c-4a49-ba1d-bc5d6448812f) is not present in table "sessions".
+COPY 0
+COPY 0
+psql:db_cluster-08-09-2025@05-22-24.backup:3254: ERROR:  column "client_id" of relation "oauth_clients" does not exist
+psql:db_cluster-08-09-2025@05-22-24.backup:3255: error: backslash commands are restricted; only \unrestrict is allowed
+psql:db_cluster-08-09-2025@05-22-24.backup:3264: ERROR:  insert or update on table "one_time_tokens" violates foreign key constraint "one_time_tokens_user_id_fkey"
+DETAIL:  Key (user_id)=(d3758bd8-efb6-44c5-8fd4-b7dd92c11a68) is not present in table "users".
+psql:db_cluster-08-09-2025@05-22-24.backup:3320: ERROR:  insert or update on table "refresh_tokens" violates foreign key constraint "refresh_tokens_session_id_fkey"
+DETAIL:  Key (session_id)=(58c9cc12-f42c-4a49-ba1d-bc5d6448812f) is not present in table "sessions".
+COPY 0
+COPY 0
+psql:db_cluster-08-09-2025@05-22-24.backup:3343: ERROR:  permission denied for table schema_migrations
+psql:db_cluster-08-09-2025@05-22-24.backup:3407: error: backslash commands are restricted; only \unrestrict is allowed
+psql:db_cluster-08-09-2025@05-22-24.backup:3414: ERROR:  syntax error at or near "20171026211738"
+LINE 1: 20171026211738
+        ^
+psql:db_cluster-08-09-2025@05-22-24.backup:3415: error: backslash commands are restricted; only \unrestrict is allowed
+psql:db_cluster-08-09-2025@05-22-24.backup:3416: error: backslash commands are restricted; only \unrestrict is allowed
+psql:db_cluster-08-09-2025@05-22-24.backup:3417: error: backslash commands are restricted; only \unrestrict is allowed
+psql:db_cluster-08-09-2025@05-22-24.backup:3418: error: backslash commands are restricted; only \unrestrict is allowed
+psql:db_cluster-08-09-2025@05-22-24.backup:3419: error: backslash commands are restricted; only \unrestrict is allowed
+psql:db_cluster-08-09-2025@05-22-24.backup:3420: error: backslash commands are restricted; only \unrestrict is allowed
+psql:db_cluster-08-09-2025@05-22-24.backup:3421: error: backslash commands are restricted; only \unrestrict is allowed
+psql:db_cluster-08-09-2025@05-22-24.backup:3422: error: backslash commands are restricted; only \unrestrict is allowed
+psql:db_cluster-08-09-2025@05-22-24.backup:3423: error: backslash commands are restricted; only \unrestrict is allowed
+psql:db_cluster-08-09-2025@05-22-24.backup:3424: error: backslash commands are restricted; only \unrestrict is allowed
+psql:db_cluster-08-09-2025@05-22-24.backup:3425: error: backslash commands are restricted; only \unrestrict is allowed
+psql:db_cluster-08-09-2025@05-22-24.backup:3426: error: backslash commands are restricted; only \unrestrict is allowed
+psql:db_cluster-08-09-2025@05-22-24.backup:3427: error: backslash commands are restricted; only \unrestrict is allowed
+psql:db_cluster-08-09-2025@05-22-24.backup:3428: error: backslash commands are restricted; only \unrestrict is allowed
+psql:db_cluster-08-09-2025@05-22-24.backup:3429: error: backslash commands are restricted; only \unrestrict is allowed
+psql:db_cluster-08-09-2025@05-22-24.backup:3430: error: backslash commands are restricted; only \unrestrict is allowed
+psql:db_cluster-08-09-2025@05-22-24.backup:3437: ERROR:  trailing junk after numeric literal at or near "58c9cc12"
+LINE 1: 58c9cc12-f42c-4a49-ba1d-bc5d6448812f dd3746f5-b967-4579-8134...
+        ^
+psql:db_cluster-08-09-2025@05-22-24.backup:3438: error: backslash commands are restricted; only \unrestrict is allowed
+COPY 0
+COPY 2
+COPY 70
+COPY 50
+COPY 10
+COPY 30
+psql:db_cluster-08-09-2025@05-22-24.backup:3719: ERROR:  duplicate key value violates unique constraint "schema_migrations_pkey"
+DETAIL:  Key (version)=(20211116024918) already exists.
+CONTEXT:  COPY schema_migrations, line 1
+COPY 0
+COPY 0
+COPY 0
+psql:db_cluster-08-09-2025@05-22-24.backup:3750: ERROR:  permission denied for table migrations
+psql:db_cluster-08-09-2025@05-22-24.backup:3790: error: backslash commands are restricted; only \unrestrict is allowed
+psql:db_cluster-08-09-2025@05-22-24.backup:3797: ERROR:  syntax error at or near "0"
+LINE 1: 0 create-migrations-table e18db593bcde2aca2a408c4d1100f6abba...
+        ^
+psql:db_cluster-08-09-2025@05-22-24.backup:3798: error: backslash commands are restricted; only \unrestrict is allowed
+psql:db_cluster-08-09-2025@05-22-24.backup:3805: ERROR:  relation "storage.prefixes" does not exist
+psql:db_cluster-08-09-2025@05-22-24.backup:3806: error: backslash commands are restricted; only \unrestrict is allowed
+COPY 0
+COPY 0
+psql:db_cluster-08-09-2025@05-22-24.backup:3829: ERROR:  permission denied for table secrets
+psql:db_cluster-08-09-2025@05-22-24.backup:3830: error: backslash commands are restricted; only \unrestrict is allowed
+ setval 
+--------
+     48
+(1 row)
+
+ setval 
+--------
+      1
+(1 row)
+
+psql:db_cluster-08-09-2025@05-22-24.backup:3852: ERROR:  must be owner of table mfa_amr_claims
+psql:db_cluster-08-09-2025@05-22-24.backup:3860: ERROR:  must be owner of table audit_log_entries
+psql:db_cluster-08-09-2025@05-22-24.backup:3868: ERROR:  must be owner of table flow_state
+psql:db_cluster-08-09-2025@05-22-24.backup:3876: ERROR:  must be owner of table identities
+psql:db_cluster-08-09-2025@05-22-24.backup:3884: ERROR:  must be owner of table identities
+psql:db_cluster-08-09-2025@05-22-24.backup:3892: ERROR:  must be owner of table instances
+psql:db_cluster-08-09-2025@05-22-24.backup:3900: ERROR:  must be owner of table mfa_amr_claims
+psql:db_cluster-08-09-2025@05-22-24.backup:3908: ERROR:  must be owner of table mfa_challenges
+psql:db_cluster-08-09-2025@05-22-24.backup:3916: ERROR:  must be owner of table mfa_factors
+psql:db_cluster-08-09-2025@05-22-24.backup:3924: ERROR:  must be owner of table mfa_factors
+psql:db_cluster-08-09-2025@05-22-24.backup:3932: ERROR:  must be owner of table oauth_clients
+psql:db_cluster-08-09-2025@05-22-24.backup:3940: ERROR:  must be owner of table oauth_clients
+psql:db_cluster-08-09-2025@05-22-24.backup:3948: ERROR:  must be owner of table one_time_tokens
+psql:db_cluster-08-09-2025@05-22-24.backup:3956: ERROR:  must be owner of table refresh_tokens
+psql:db_cluster-08-09-2025@05-22-24.backup:3964: ERROR:  must be owner of table refresh_tokens
+psql:db_cluster-08-09-2025@05-22-24.backup:3972: ERROR:  must be owner of table saml_providers
+psql:db_cluster-08-09-2025@05-22-24.backup:3980: ERROR:  must be owner of table saml_providers
+psql:db_cluster-08-09-2025@05-22-24.backup:3988: ERROR:  must be owner of table saml_relay_states
+psql:db_cluster-08-09-2025@05-22-24.backup:3996: ERROR:  must be owner of table schema_migrations
+psql:db_cluster-08-09-2025@05-22-24.backup:4004: ERROR:  must be owner of table sessions
+psql:db_cluster-08-09-2025@05-22-24.backup:4012: ERROR:  must be owner of table sso_domains
+psql:db_cluster-08-09-2025@05-22-24.backup:4020: ERROR:  must be owner of table sso_providers
+psql:db_cluster-08-09-2025@05-22-24.backup:4028: ERROR:  must be owner of table users
+psql:db_cluster-08-09-2025@05-22-24.backup:4036: ERROR:  must be owner of table users
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+psql:db_cluster-08-09-2025@05-22-24.backup:4076: ERROR:  multiple primary keys for table "messages" are not allowed
+psql:db_cluster-08-09-2025@05-22-24.backup:4084: ERROR:  must be owner of table subscription
+psql:db_cluster-08-09-2025@05-22-24.backup:4092: ERROR:  must be owner of table schema_migrations
+psql:db_cluster-08-09-2025@05-22-24.backup:4100: ERROR:  must be owner of table buckets_analytics
+psql:db_cluster-08-09-2025@05-22-24.backup:4108: ERROR:  must be owner of table buckets
+psql:db_cluster-08-09-2025@05-22-24.backup:4116: ERROR:  must be owner of table migrations
+psql:db_cluster-08-09-2025@05-22-24.backup:4124: ERROR:  must be owner of table migrations
+psql:db_cluster-08-09-2025@05-22-24.backup:4132: ERROR:  must be owner of table objects
+psql:db_cluster-08-09-2025@05-22-24.backup:4140: ERROR:  relation "storage.prefixes" does not exist
+psql:db_cluster-08-09-2025@05-22-24.backup:4148: ERROR:  must be owner of table s3_multipart_uploads_parts
+psql:db_cluster-08-09-2025@05-22-24.backup:4156: ERROR:  must be owner of table s3_multipart_uploads
+psql:db_cluster-08-09-2025@05-22-24.backup:4163: ERROR:  must be owner of table audit_log_entries
+psql:db_cluster-08-09-2025@05-22-24.backup:4170: ERROR:  must be owner of table users
+psql:db_cluster-08-09-2025@05-22-24.backup:4177: ERROR:  must be owner of table users
+psql:db_cluster-08-09-2025@05-22-24.backup:4184: ERROR:  must be owner of table users
+psql:db_cluster-08-09-2025@05-22-24.backup:4191: ERROR:  must be owner of table mfa_factors
+psql:db_cluster-08-09-2025@05-22-24.backup:4198: ERROR:  must be owner of table flow_state
+psql:db_cluster-08-09-2025@05-22-24.backup:4205: ERROR:  must be owner of table identities
+psql:db_cluster-08-09-2025@05-22-24.backup:4212: ERROR:  must be owner of index identities_email_idx
+psql:db_cluster-08-09-2025@05-22-24.backup:4219: ERROR:  must be owner of table identities
+psql:db_cluster-08-09-2025@05-22-24.backup:4226: ERROR:  must be owner of table flow_state
+psql:db_cluster-08-09-2025@05-22-24.backup:4233: ERROR:  must be owner of table flow_state
+psql:db_cluster-08-09-2025@05-22-24.backup:4240: ERROR:  must be owner of table mfa_challenges
+psql:db_cluster-08-09-2025@05-22-24.backup:4247: ERROR:  must be owner of table mfa_factors
+psql:db_cluster-08-09-2025@05-22-24.backup:4254: ERROR:  must be owner of table mfa_factors
+psql:db_cluster-08-09-2025@05-22-24.backup:4261: ERROR:  must be owner of table oauth_clients
+psql:db_cluster-08-09-2025@05-22-24.backup:4268: ERROR:  must be owner of table oauth_clients
+psql:db_cluster-08-09-2025@05-22-24.backup:4275: ERROR:  must be owner of table one_time_tokens
+psql:db_cluster-08-09-2025@05-22-24.backup:4282: ERROR:  must be owner of table one_time_tokens
+psql:db_cluster-08-09-2025@05-22-24.backup:4289: ERROR:  must be owner of table one_time_tokens
+psql:db_cluster-08-09-2025@05-22-24.backup:4296: ERROR:  must be owner of table users
+psql:db_cluster-08-09-2025@05-22-24.backup:4303: ERROR:  must be owner of table users
+psql:db_cluster-08-09-2025@05-22-24.backup:4310: ERROR:  must be owner of table refresh_tokens
+psql:db_cluster-08-09-2025@05-22-24.backup:4317: ERROR:  must be owner of table refresh_tokens
+psql:db_cluster-08-09-2025@05-22-24.backup:4324: ERROR:  must be owner of table refresh_tokens
+psql:db_cluster-08-09-2025@05-22-24.backup:4331: ERROR:  must be owner of table refresh_tokens
+psql:db_cluster-08-09-2025@05-22-24.backup:4338: ERROR:  must be owner of table refresh_tokens
+psql:db_cluster-08-09-2025@05-22-24.backup:4345: ERROR:  must be owner of table saml_providers
+psql:db_cluster-08-09-2025@05-22-24.backup:4352: ERROR:  must be owner of table saml_relay_states
+psql:db_cluster-08-09-2025@05-22-24.backup:4359: ERROR:  must be owner of table saml_relay_states
+psql:db_cluster-08-09-2025@05-22-24.backup:4366: ERROR:  must be owner of table saml_relay_states
+psql:db_cluster-08-09-2025@05-22-24.backup:4373: ERROR:  must be owner of table sessions
+psql:db_cluster-08-09-2025@05-22-24.backup:4380: ERROR:  must be owner of table sessions
+psql:db_cluster-08-09-2025@05-22-24.backup:4387: ERROR:  must be owner of table sso_domains
+psql:db_cluster-08-09-2025@05-22-24.backup:4394: ERROR:  must be owner of table sso_domains
+psql:db_cluster-08-09-2025@05-22-24.backup:4401: ERROR:  must be owner of table sso_providers
+psql:db_cluster-08-09-2025@05-22-24.backup:4408: ERROR:  must be owner of table sso_providers
+psql:db_cluster-08-09-2025@05-22-24.backup:4415: ERROR:  must be owner of table mfa_factors
+psql:db_cluster-08-09-2025@05-22-24.backup:4422: ERROR:  must be owner of table sessions
+psql:db_cluster-08-09-2025@05-22-24.backup:4429: ERROR:  must be owner of table users
+psql:db_cluster-08-09-2025@05-22-24.backup:4436: ERROR:  must be owner of index users_email_partial_key
+psql:db_cluster-08-09-2025@05-22-24.backup:4443: ERROR:  must be owner of table users
+psql:db_cluster-08-09-2025@05-22-24.backup:4450: ERROR:  must be owner of table users
+psql:db_cluster-08-09-2025@05-22-24.backup:4457: ERROR:  must be owner of table users
+psql:db_cluster-08-09-2025@05-22-24.backup:4464: ERROR:  must be owner of table subscription
+psql:db_cluster-08-09-2025@05-22-24.backup:4471: ERROR:  must be owner of table subscription
+psql:db_cluster-08-09-2025@05-22-24.backup:4478: ERROR:  must be owner of table buckets
+psql:db_cluster-08-09-2025@05-22-24.backup:4485: ERROR:  must be owner of table objects
+psql:db_cluster-08-09-2025@05-22-24.backup:4492: ERROR:  must be owner of table s3_multipart_uploads
+psql:db_cluster-08-09-2025@05-22-24.backup:4499: ERROR:  must be owner of table objects
+psql:db_cluster-08-09-2025@05-22-24.backup:4506: ERROR:  must be owner of table objects
+psql:db_cluster-08-09-2025@05-22-24.backup:4513: ERROR:  must be owner of table objects
+psql:db_cluster-08-09-2025@05-22-24.backup:4520: ERROR:  relation "storage.prefixes" does not exist
+psql:db_cluster-08-09-2025@05-22-24.backup:4527: ERROR:  must be owner of table objects
+psql:db_cluster-08-09-2025@05-22-24.backup:4534: ERROR:  must be owner of table objects
+psql:db_cluster-08-09-2025@05-22-24.backup:4541: ERROR:  trigger "tr_check_filters" for relation "subscription" already exists
+psql:db_cluster-08-09-2025@05-22-24.backup:4548: ERROR:  trigger "enforce_bucket_name_length_trigger" for relation "buckets" already exists
+psql:db_cluster-08-09-2025@05-22-24.backup:4555: ERROR:  function storage.delete_prefix_hierarchy_trigger() does not exist
+psql:db_cluster-08-09-2025@05-22-24.backup:4562: ERROR:  function storage.objects_insert_prefix_trigger() does not exist
+psql:db_cluster-08-09-2025@05-22-24.backup:4569: ERROR:  function storage.objects_update_prefix_trigger() does not exist
+psql:db_cluster-08-09-2025@05-22-24.backup:4576: ERROR:  relation "storage.prefixes" does not exist
+psql:db_cluster-08-09-2025@05-22-24.backup:4583: ERROR:  relation "storage.prefixes" does not exist
+psql:db_cluster-08-09-2025@05-22-24.backup:4590: ERROR:  trigger "update_objects_updated_at" for relation "objects" already exists
+psql:db_cluster-08-09-2025@05-22-24.backup:4598: ERROR:  must be owner of table identities
+psql:db_cluster-08-09-2025@05-22-24.backup:4606: ERROR:  must be owner of table mfa_amr_claims
+psql:db_cluster-08-09-2025@05-22-24.backup:4614: ERROR:  must be owner of table mfa_challenges
+psql:db_cluster-08-09-2025@05-22-24.backup:4622: ERROR:  must be owner of table mfa_factors
+psql:db_cluster-08-09-2025@05-22-24.backup:4630: ERROR:  must be owner of table one_time_tokens
+psql:db_cluster-08-09-2025@05-22-24.backup:4638: ERROR:  must be owner of table refresh_tokens
+psql:db_cluster-08-09-2025@05-22-24.backup:4646: ERROR:  must be owner of table saml_providers
+psql:db_cluster-08-09-2025@05-22-24.backup:4654: ERROR:  must be owner of table saml_relay_states
+psql:db_cluster-08-09-2025@05-22-24.backup:4662: ERROR:  must be owner of table saml_relay_states
+psql:db_cluster-08-09-2025@05-22-24.backup:4670: ERROR:  must be owner of table sessions
+psql:db_cluster-08-09-2025@05-22-24.backup:4678: ERROR:  must be owner of table sso_domains
+psql:db_cluster-08-09-2025@05-22-24.backup:4686: ERROR:  must be owner of table objects
+psql:db_cluster-08-09-2025@05-22-24.backup:4694: ERROR:  relation "storage.prefixes" does not exist
+psql:db_cluster-08-09-2025@05-22-24.backup:4702: ERROR:  must be owner of table s3_multipart_uploads
+psql:db_cluster-08-09-2025@05-22-24.backup:4710: ERROR:  must be owner of table s3_multipart_uploads_parts
+psql:db_cluster-08-09-2025@05-22-24.backup:4718: ERROR:  must be owner of table s3_multipart_uploads_parts
+psql:db_cluster-08-09-2025@05-22-24.backup:4725: ERROR:  must be owner of table audit_log_entries
+psql:db_cluster-08-09-2025@05-22-24.backup:4731: ERROR:  must be owner of table flow_state
+psql:db_cluster-08-09-2025@05-22-24.backup:4737: ERROR:  must be owner of table identities
+psql:db_cluster-08-09-2025@05-22-24.backup:4743: ERROR:  must be owner of table instances
+psql:db_cluster-08-09-2025@05-22-24.backup:4749: ERROR:  must be owner of table mfa_amr_claims
+psql:db_cluster-08-09-2025@05-22-24.backup:4755: ERROR:  must be owner of table mfa_challenges
+psql:db_cluster-08-09-2025@05-22-24.backup:4761: ERROR:  must be owner of table mfa_factors
+psql:db_cluster-08-09-2025@05-22-24.backup:4767: ERROR:  must be owner of table one_time_tokens
+psql:db_cluster-08-09-2025@05-22-24.backup:4773: ERROR:  must be owner of table refresh_tokens
+psql:db_cluster-08-09-2025@05-22-24.backup:4779: ERROR:  must be owner of table saml_providers
+psql:db_cluster-08-09-2025@05-22-24.backup:4785: ERROR:  must be owner of table saml_relay_states
+psql:db_cluster-08-09-2025@05-22-24.backup:4791: ERROR:  must be owner of table schema_migrations
+psql:db_cluster-08-09-2025@05-22-24.backup:4797: ERROR:  must be owner of table sessions
+psql:db_cluster-08-09-2025@05-22-24.backup:4803: ERROR:  must be owner of table sso_domains
+psql:db_cluster-08-09-2025@05-22-24.backup:4809: ERROR:  must be owner of table sso_providers
+psql:db_cluster-08-09-2025@05-22-24.backup:4815: ERROR:  must be owner of table users
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+CREATE POLICY
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+psql:db_cluster-08-09-2025@05-22-24.backup:4949: ERROR:  must be owner of table buckets
+psql:db_cluster-08-09-2025@05-22-24.backup:4955: ERROR:  must be owner of table buckets_analytics
+psql:db_cluster-08-09-2025@05-22-24.backup:4961: ERROR:  must be owner of table migrations
+psql:db_cluster-08-09-2025@05-22-24.backup:4967: ERROR:  must be owner of table objects
+psql:db_cluster-08-09-2025@05-22-24.backup:4973: ERROR:  relation "storage.prefixes" does not exist
+psql:db_cluster-08-09-2025@05-22-24.backup:4979: ERROR:  must be owner of table s3_multipart_uploads
+psql:db_cluster-08-09-2025@05-22-24.backup:4985: ERROR:  must be owner of table s3_multipart_uploads_parts
+psql:db_cluster-08-09-2025@05-22-24.backup:4991: ERROR:  publication "supabase_realtime" already exists
+ALTER PUBLICATION
+psql:db_cluster-08-09-2025@05-22-24.backup:5000: WARNING:  no privileges were granted for "auth"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5001: WARNING:  no privileges were granted for "auth"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5002: WARNING:  no privileges were granted for "auth"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5003: WARNING:  no privileges were granted for "auth"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5004: WARNING:  no privileges were granted for "auth"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5005: WARNING:  no privileges were granted for "auth"
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5032: WARNING:  no privileges were granted for "realtime"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5033: WARNING:  no privileges were granted for "realtime"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5034: WARNING:  no privileges were granted for "realtime"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5035: WARNING:  no privileges were granted for "realtime"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5036: WARNING:  no privileges were granted for "realtime"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5043: ERROR:  grant options cannot be granted back to your own grantor
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5055: ERROR:  grant options cannot be granted back to your own grantor
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5063: WARNING:  no privileges were granted for "email"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5070: WARNING:  no privileges were granted for "jwt"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5071: WARNING:  no privileges were granted for "jwt"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5078: WARNING:  no privileges were granted for "role"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5085: WARNING:  no privileges were granted for "uid"
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5218: WARNING:  no privileges could be revoked for "grant_pg_cron_access"
+REVOKE
+psql:db_cluster-08-09-2025@05-22-24.backup:5219: WARNING:  no privileges were granted for "grant_pg_cron_access"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5220: WARNING:  no privileges were granted for "grant_pg_cron_access"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5227: ERROR:  grant options cannot be granted back to your own grantor
+psql:db_cluster-08-09-2025@05-22-24.backup:5234: WARNING:  no privileges could be revoked for "grant_pg_net_access"
+REVOKE
+psql:db_cluster-08-09-2025@05-22-24.backup:5235: WARNING:  no privileges were granted for "grant_pg_net_access"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5236: WARNING:  no privileges were granted for "grant_pg_net_access"
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5468: ERROR:  grant options cannot be granted back to your own grantor
+psql:db_cluster-08-09-2025@05-22-24.backup:5475: ERROR:  grant options cannot be granted back to your own grantor
+psql:db_cluster-08-09-2025@05-22-24.backup:5482: ERROR:  grant options cannot be granted back to your own grantor
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5579: WARNING:  no privileges were granted for "graphql"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5580: WARNING:  no privileges were granted for "graphql"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5581: WARNING:  no privileges were granted for "graphql"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5582: WARNING:  no privileges were granted for "graphql"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5589: ERROR:  permission denied for function get_auth
+psql:db_cluster-08-09-2025@05-22-24.backup:5590: ERROR:  permission denied for function get_auth
+psql:db_cluster-08-09-2025@05-22-24.backup:5591: ERROR:  permission denied for function get_auth
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5616: WARNING:  no privileges were granted for "apply_rls"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5617: WARNING:  no privileges were granted for "apply_rls"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5618: WARNING:  no privileges were granted for "apply_rls"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5619: WARNING:  no privileges were granted for "apply_rls"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5620: WARNING:  no privileges were granted for "apply_rls"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5621: WARNING:  no privileges were granted for "apply_rls"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5628: WARNING:  no privileges were granted for "broadcast_changes"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5629: WARNING:  no privileges were granted for "broadcast_changes"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5636: WARNING:  no privileges were granted for "build_prepared_statement_sql"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5637: WARNING:  no privileges were granted for "build_prepared_statement_sql"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5638: WARNING:  no privileges were granted for "build_prepared_statement_sql"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5639: WARNING:  no privileges were granted for "build_prepared_statement_sql"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5640: WARNING:  no privileges were granted for "build_prepared_statement_sql"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5641: WARNING:  no privileges were granted for "build_prepared_statement_sql"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5648: WARNING:  no privileges were granted for "cast"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5649: WARNING:  no privileges were granted for "cast"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5650: WARNING:  no privileges were granted for "cast"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5651: WARNING:  no privileges were granted for "cast"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5652: WARNING:  no privileges were granted for "cast"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5653: WARNING:  no privileges were granted for "cast"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5660: WARNING:  no privileges were granted for "check_equality_op"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5661: WARNING:  no privileges were granted for "check_equality_op"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5662: WARNING:  no privileges were granted for "check_equality_op"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5663: WARNING:  no privileges were granted for "check_equality_op"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5664: WARNING:  no privileges were granted for "check_equality_op"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5665: WARNING:  no privileges were granted for "check_equality_op"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5672: WARNING:  no privileges were granted for "is_visible_through_filters"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5673: WARNING:  no privileges were granted for "is_visible_through_filters"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5674: WARNING:  no privileges were granted for "is_visible_through_filters"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5675: WARNING:  no privileges were granted for "is_visible_through_filters"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5676: WARNING:  no privileges were granted for "is_visible_through_filters"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5677: WARNING:  no privileges were granted for "is_visible_through_filters"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5684: WARNING:  no privileges were granted for "list_changes"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5685: WARNING:  no privileges were granted for "list_changes"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5686: WARNING:  no privileges were granted for "list_changes"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5687: WARNING:  no privileges were granted for "list_changes"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5688: WARNING:  no privileges were granted for "list_changes"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5689: WARNING:  no privileges were granted for "list_changes"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5696: WARNING:  no privileges were granted for "quote_wal2json"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5697: WARNING:  no privileges were granted for "quote_wal2json"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5698: WARNING:  no privileges were granted for "quote_wal2json"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5699: WARNING:  no privileges were granted for "quote_wal2json"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5700: WARNING:  no privileges were granted for "quote_wal2json"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5701: WARNING:  no privileges were granted for "quote_wal2json"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5708: WARNING:  no privileges were granted for "send"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5709: WARNING:  no privileges were granted for "send"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5716: WARNING:  no privileges were granted for "subscription_check_filters"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5717: WARNING:  no privileges were granted for "subscription_check_filters"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5718: WARNING:  no privileges were granted for "subscription_check_filters"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5719: WARNING:  no privileges were granted for "subscription_check_filters"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5720: WARNING:  no privileges were granted for "subscription_check_filters"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5721: WARNING:  no privileges were granted for "subscription_check_filters"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5728: WARNING:  no privileges were granted for "to_regrole"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5729: WARNING:  no privileges were granted for "to_regrole"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5730: WARNING:  no privileges were granted for "to_regrole"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5731: WARNING:  no privileges were granted for "to_regrole"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5732: WARNING:  no privileges were granted for "to_regrole"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5733: WARNING:  no privileges were granted for "to_regrole"
+GRANT
+GRANT
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5748: ERROR:  grant options cannot be granted back to your own grantor
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5756: ERROR:  grant options cannot be granted back to your own grantor
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5764: ERROR:  grant options cannot be granted back to your own grantor
+GRANT
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5773: WARNING:  no privileges were granted for "audit_log_entries"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5774: ERROR:  grant options cannot be granted back to your own grantor
+psql:db_cluster-08-09-2025@05-22-24.backup:5781: WARNING:  no privileges were granted for "flow_state"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5782: ERROR:  grant options cannot be granted back to your own grantor
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5790: WARNING:  no privileges were granted for "identities"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5791: ERROR:  grant options cannot be granted back to your own grantor
+GRANT
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5800: WARNING:  no privileges were granted for "instances"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5801: ERROR:  grant options cannot be granted back to your own grantor
+psql:db_cluster-08-09-2025@05-22-24.backup:5808: WARNING:  no privileges were granted for "mfa_amr_claims"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5809: ERROR:  grant options cannot be granted back to your own grantor
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5817: WARNING:  no privileges were granted for "mfa_challenges"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5818: ERROR:  grant options cannot be granted back to your own grantor
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5826: WARNING:  no privileges were granted for "mfa_factors"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5827: ERROR:  grant options cannot be granted back to your own grantor
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5835: WARNING:  no privileges were granted for "oauth_clients"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5836: WARNING:  no privileges were granted for "oauth_clients"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5843: WARNING:  no privileges were granted for "one_time_tokens"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5844: ERROR:  grant options cannot be granted back to your own grantor
+GRANT
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5853: WARNING:  no privileges were granted for "refresh_tokens"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5854: ERROR:  grant options cannot be granted back to your own grantor
+psql:db_cluster-08-09-2025@05-22-24.backup:5861: WARNING:  no privileges were granted for "refresh_tokens_id_seq"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5862: WARNING:  no privileges were granted for "refresh_tokens_id_seq"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5869: WARNING:  no privileges were granted for "saml_providers"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5870: ERROR:  grant options cannot be granted back to your own grantor
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5878: WARNING:  no privileges were granted for "saml_relay_states"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5879: ERROR:  grant options cannot be granted back to your own grantor
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5887: ERROR:  grant options cannot be granted back to your own grantor
+psql:db_cluster-08-09-2025@05-22-24.backup:5894: WARNING:  no privileges were granted for "sessions"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5895: ERROR:  grant options cannot be granted back to your own grantor
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5903: WARNING:  no privileges were granted for "sso_domains"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5904: ERROR:  grant options cannot be granted back to your own grantor
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5912: WARNING:  no privileges were granted for "sso_providers"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5913: ERROR:  grant options cannot be granted back to your own grantor
+GRANT
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5922: WARNING:  no privileges were granted for "users"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5923: ERROR:  grant options cannot be granted back to your own grantor
+REVOKE
+GRANT
+GRANT
+REVOKE
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5986: WARNING:  no privileges were granted for "schema_migrations"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5987: WARNING:  no privileges were granted for "schema_migrations"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5988: WARNING:  no privileges were granted for "schema_migrations"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5989: WARNING:  no privileges were granted for "schema_migrations"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5990: WARNING:  no privileges were granted for "schema_migrations"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5991: WARNING:  no privileges were granted for "schema_migrations"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5998: WARNING:  no privileges were granted for "subscription"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:5999: WARNING:  no privileges were granted for "subscription"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:6000: WARNING:  no privileges were granted for "subscription"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:6001: WARNING:  no privileges were granted for "subscription"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:6002: WARNING:  no privileges were granted for "subscription"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:6003: WARNING:  no privileges were granted for "subscription"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:6010: WARNING:  no privileges were granted for "subscription_id_seq"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:6011: WARNING:  no privileges were granted for "subscription_id_seq"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:6012: WARNING:  no privileges were granted for "subscription_id_seq"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:6013: WARNING:  no privileges were granted for "subscription_id_seq"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:6014: WARNING:  no privileges were granted for "subscription_id_seq"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:6015: WARNING:  no privileges were granted for "subscription_id_seq"
+GRANT
+GRANT
+GRANT
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:6025: ERROR:  grant options cannot be granted back to your own grantor
+psql:db_cluster-08-09-2025@05-22-24.backup:6032: WARNING:  no privileges were granted for "buckets_analytics"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:6033: WARNING:  no privileges were granted for "buckets_analytics"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:6034: WARNING:  no privileges were granted for "buckets_analytics"
+GRANT
+GRANT
+GRANT
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:6044: ERROR:  grant options cannot be granted back to your own grantor
+psql:db_cluster-08-09-2025@05-22-24.backup:6051: ERROR:  relation "storage.prefixes" does not exist
+psql:db_cluster-08-09-2025@05-22-24.backup:6052: ERROR:  relation "storage.prefixes" does not exist
+psql:db_cluster-08-09-2025@05-22-24.backup:6053: ERROR:  relation "storage.prefixes" does not exist
+psql:db_cluster-08-09-2025@05-22-24.backup:6060: WARNING:  no privileges were granted for "s3_multipart_uploads"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:6061: WARNING:  no privileges were granted for "s3_multipart_uploads"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:6062: WARNING:  no privileges were granted for "s3_multipart_uploads"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:6069: WARNING:  no privileges were granted for "s3_multipart_uploads_parts"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:6070: WARNING:  no privileges were granted for "s3_multipart_uploads_parts"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:6071: WARNING:  no privileges were granted for "s3_multipart_uploads_parts"
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:6078: ERROR:  grant options cannot be granted back to your own grantor
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:6086: ERROR:  grant options cannot be granted back to your own grantor
+GRANT
+psql:db_cluster-08-09-2025@05-22-24.backup:6094: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6095: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6102: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6103: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6110: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6111: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6118: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6125: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6132: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6139: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6140: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6141: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6142: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6149: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6150: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6151: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6152: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6159: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6160: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6161: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6162: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6169: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6170: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6171: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6172: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6179: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6180: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6181: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6182: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6189: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6190: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6191: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6192: ERROR:  permission denied to change default privileges
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+psql:db_cluster-08-09-2025@05-22-24.backup:6209: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6210: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6211: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6212: ERROR:  permission denied to change default privileges
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+psql:db_cluster-08-09-2025@05-22-24.backup:6229: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6230: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6231: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6232: ERROR:  permission denied to change default privileges
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+psql:db_cluster-08-09-2025@05-22-24.backup:6249: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6250: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6251: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6252: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6259: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6260: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6267: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6268: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6275: ERROR:  permission denied to change default privileges
+psql:db_cluster-08-09-2025@05-22-24.backup:6276: ERROR:  permission denied to change default privileges
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+psql:db_cluster-08-09-2025@05-22-24.backup:6315: ERROR:  Non-superuser owned event trigger must execute a non-superuser owned function
+DETAIL:  The current user "postgres" is not a superuser and the function "extensions.set_graphql_placeholder" is owned by a superuser
+ALTER EVENT TRIGGER
+psql:db_cluster-08-09-2025@05-22-24.backup:6326: ERROR:  Non-superuser owned event trigger must execute a non-superuser owned function
+DETAIL:  The current user "postgres" is not a superuser and the function "extensions.grant_pg_cron_access" is owned by a superuser
+ALTER EVENT TRIGGER
+psql:db_cluster-08-09-2025@05-22-24.backup:6337: ERROR:  Non-superuser owned event trigger must execute a non-superuser owned function
+DETAIL:  The current user "postgres" is not a superuser and the function "extensions.grant_pg_graphql_access" is owned by a superuser
+ALTER EVENT TRIGGER
+psql:db_cluster-08-09-2025@05-22-24.backup:6348: ERROR:  Non-superuser owned event trigger must execute a non-superuser owned function
+DETAIL:  The current user "postgres" is not a superuser and the function "extensions.grant_pg_net_access" is owned by a superuser
+ALTER EVENT TRIGGER
+psql:db_cluster-08-09-2025@05-22-24.backup:6358: ERROR:  Non-superuser owned event trigger must execute a non-superuser owned function
+DETAIL:  The current user "postgres" is not a superuser and the function "extensions.pgrst_ddl_watch" is owned by a superuser
+ALTER EVENT TRIGGER
+psql:db_cluster-08-09-2025@05-22-24.backup:6368: ERROR:  Non-superuser owned event trigger must execute a non-superuser owned function
+DETAIL:  The current user "postgres" is not a superuser and the function "extensions.pgrst_drop_watch" is owned by a superuser
+ALTER EVENT TRIGGER
