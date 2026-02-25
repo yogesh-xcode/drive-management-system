@@ -93,7 +93,7 @@ export default function Page() {
             }}
             title="Staff"
             entity="staff"
-            rowsPerPage={10}
+            rowsPerPage={9}
             loading={loading}
             immutableFields={["id"]}
           />
