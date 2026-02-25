@@ -107,7 +107,7 @@ export default function Page() {
             }}
             title="Programs"
             entity="client"
-            rowsPerPage={9}
+            rowsPerPage={10}
             loading={loading}
             immutableFields={["programNo"]}
           />

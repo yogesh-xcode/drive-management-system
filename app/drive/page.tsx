@@ -86,7 +86,7 @@ export default function Page() {
             }}
             title="Drives"
             entity="drive"
-            rowsPerPage={9}
+            rowsPerPage={10}
             loading={loading}
             immutableFields={["id"]}
           />

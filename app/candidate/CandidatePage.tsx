@@ -105,7 +105,7 @@ export default function Page() {
             }}
             title="Candidate"
             entity="candidate"
-            rowsPerPage={9}
+            rowsPerPage={10}
             loading={loading}
             immutableFields={["id"]}
             // 🔹 Controlled open state for Quick Create
