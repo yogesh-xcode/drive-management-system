@@ -11,17 +11,21 @@ import {
   clientDataService,
   driveDataService,
   staffDataService,
+  userService,
 } from "@/lib/repositories";
 import CompanyOverviewAreaChart from "@/components/Chart/CompanyOverviewChart";
 import { DashboardSkeleten } from "@/components/Skeleton/DashboardSkeleten";
 import { PageHeader, PageSection } from "@/components/layout/PageHeader";
+import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
+  const [authenticated, setAuthenticated] = useState(false);
   const [staffData, setStaffData] = useState<Staff[]>([]);
   const [candidateData, setCandidateData] = useState<Candidate[]>([]);
   const [clientData, setClientData] = useState<Client[]>([]);
   const [driveData, setDriveData] = useState<Drive[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   async function fetchData() {
     setLoading(true);
@@ -41,10 +45,30 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    let mounted = true;
 
-  if (loading) {
+    const init = async () => {
+      setLoading(true);
+      const user = await userService.get();
+      if (!mounted) return;
+
+      if (!user) {
+        router.replace("/login");
+        setLoading(false);
+        return;
+      }
+
+      setAuthenticated(true);
+      await fetchData();
+    };
+
+    void init();
+    return () => {
+      mounted = false;
+    };
+  }, [router]);
+
+  if (loading || !authenticated) {
     return (
       <div className="flex flex-1 flex-col">
         <PageSection>
