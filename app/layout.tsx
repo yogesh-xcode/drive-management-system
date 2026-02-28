@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "@/theme-variants/variant-12.css";
+import "@/theme-variants/variant-13.css";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
