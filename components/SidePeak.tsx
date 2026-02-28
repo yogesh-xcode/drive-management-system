@@ -10,6 +10,13 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import React, { useEffect, useRef, useMemo, useState } from "react";
 
 type FieldType = "text" | "email" | "number" | "date" | "select";
@@ -114,6 +121,16 @@ export function SidePeak<T extends Record<string, any>>({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const missingRequired = fields.find(
+      (field) =>
+        field.required && String(values[field.name] ?? "").trim().length === 0,
+    );
+    if (missingRequired) {
+      setError(`${missingRequired.label} is required.`);
+      return;
+    }
+
     const msg = validate?.(values);
     if (msg) {
       setError(msg);
@@ -156,19 +173,41 @@ export function SidePeak<T extends Record<string, any>>({
                   {f.required ? " *" : ""}
                 </label>
 
-                <Input
-                  id={f.name}
-                  name={f.name}
-                  type={f.type ?? "text"}
-                  placeholder={f.placeholder}
-                  required={f.required}
-                  disabled={
-                    f.disabled ||
-                    (mode === "update" && immutable?.includes(f.name))
-                  }
-                  value={values[f.name] ?? ""}
-                  onChange={(e) => handleChange(f.name, e.target.value)}
-                />
+                {f.type === "select" ? (
+                  <Select
+                    value={String(values[f.name] ?? "")}
+                    onValueChange={(value) => handleChange(f.name, value)}
+                    disabled={
+                      f.disabled ||
+                      (mode === "update" && immutable?.includes(f.name))
+                    }
+                  >
+                    <SelectTrigger id={f.name}>
+                      <SelectValue placeholder={f.placeholder || "Select option"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(f.options || []).map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    id={f.name}
+                    name={f.name}
+                    type={f.type ?? "text"}
+                    placeholder={f.placeholder}
+                    required={f.required}
+                    disabled={
+                      f.disabled ||
+                      (mode === "update" && immutable?.includes(f.name))
+                    }
+                    value={values[f.name] ?? ""}
+                    onChange={(e) => handleChange(f.name, e.target.value)}
+                  />
+                )}
               </div>
             ))}
 

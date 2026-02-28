@@ -9,13 +9,31 @@ import CardCover from "@/components/Cards/CardCover";
 import DashboardCard from "@/components/Cards/DashboardCard";
 import { DriveStatsCard } from "@/components/Cards/Drive/StatCard";
 import { useRouter } from "next/navigation";
-import { PageHeader, PageSection } from "@/components/layout/PageHeader";
+import { PageSection } from "@/components/layout/PageHeader";
+import { FileUploadDialog } from "@/components/FileUploadDialog";
+import PageSkeleton from "@/components/Skeleton/PageSkeleton";
 
 export default function Page() {
+  const [authenticated, setAuthenticated] = React.useState(false);
   const [driveData, setDriveData] = React.useState<Drive[]>([]);
   const [loading, setLoading] = React.useState(true);
 
   const router = useRouter();
+  const normalizeValue = (value: unknown) =>
+    String(value ?? "").trim().toLowerCase();
+
+  const isSameRow = (
+    existing: Record<string, unknown>,
+    incoming: Record<string, unknown>,
+  ) => {
+    const comparableKeys = Object.keys(incoming).filter(
+      (key) => key !== "id" && key !== "user_id" && key !== "id_uuid",
+    );
+
+    return comparableKeys.every(
+      (key) => normalizeValue(existing[key]) === normalizeValue(incoming[key]),
+    );
+  };
 
   async function fetchData() {
     setLoading(true);
@@ -38,6 +56,7 @@ export default function Page() {
         return;
       }
 
+      setAuthenticated(true);
       const result = await driveDataService.get();
       if (!mounted) return;
       setDriveData(result.data || []);
@@ -50,12 +69,12 @@ export default function Page() {
     };
   }, [router]);
 
+  if (loading || !authenticated) {
+    return <PageSkeleton />;
+  }
+
   return (
     <div className="flex flex-1 flex-col">
-      <PageHeader
-        title="Drives"
-        description="Schedule, monitor, and analyze hiring drive execution"
-      />
       <div className="@container/main flex flex-1 flex-col">
         <PageSection>
           <CardCover>
@@ -63,6 +82,11 @@ export default function Page() {
             <DriveStatsCard
               data={driveData}
               type="scheduled"
+              description={""}
+            />
+            <DriveStatsCard
+              data={driveData}
+              type="completed"
               description={""}
             />
             <DashboardCard />
@@ -86,9 +110,42 @@ export default function Page() {
             }}
             title="Drives"
             entity="drive"
-            rowsPerPage={10}
+            rowsPerPage={8}
             loading={loading}
             immutableFields={["id"]}
+            toolbarBeforeExport={
+              <FileUploadDialog
+                entityLabel="Drive"
+                fields={driveFields}
+                onImportRows={async (rows) => {
+                  let inserted = 0;
+                  let skipped = 0;
+                  const existingResult = await driveDataService.get();
+                  const existingRows = (existingResult.data ?? []) as Record<
+                    string,
+                    unknown
+                  >[];
+
+                  for (const row of rows) {
+                    if (existingRows.some((existing) => isSameRow(existing, row))) {
+                      skipped += 1;
+                      continue;
+                    }
+
+                    try {
+                      await driveDataService.create(row as Omit<Drive, "id">);
+                      inserted += 1;
+                      existingRows.push(row);
+                    } catch (error) {
+                      throw error;
+                    }
+                  }
+
+                  await fetchData();
+                  return { inserted, skipped };
+                }}
+              />
+            }
           />
         </PageSection>
       </div>

@@ -17,11 +17,11 @@ export const driveColumns = [
   },
   {
     accessorKey: "title",
-    header: "Drive Title",
+    header: () => <div className="-ml-4 ">Drive Title</div>,
   },
   {
     accessorKey: "location",
-    header: "Location",
+    header: () => <div className="-ml-8">Location</div>,
   },
   {
     accessorKey: "status",
@@ -29,11 +29,7 @@ export const driveColumns = [
     cell: ({ row }: any) => {
       const status = row.getValue("status") as string;
       const colorClass = statusColors[status] || "status-unknown";
-      return (
-        <span className={colorClass}>
-          {status}
-        </span>
-      );
+      return <span className={colorClass}>{status}</span>;
     },
   },
   {

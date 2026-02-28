@@ -11,17 +11,21 @@ import {
   clientDataService,
   driveDataService,
   staffDataService,
+  userService,
 } from "@/lib/repositories";
 import CompanyOverviewAreaChart from "@/components/Chart/CompanyOverviewChart";
 import { DashboardSkeleten } from "@/components/Skeleton/DashboardSkeleten";
-import { PageHeader, PageSection } from "@/components/layout/PageHeader";
+import { PageSection } from "@/components/layout/PageHeader";
+import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
+  const [authenticated, setAuthenticated] = useState(false);
   const [staffData, setStaffData] = useState<Staff[]>([]);
   const [candidateData, setCandidateData] = useState<Candidate[]>([]);
   const [clientData, setClientData] = useState<Client[]>([]);
   const [driveData, setDriveData] = useState<Drive[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   async function fetchData() {
     setLoading(true);
@@ -41,16 +45,32 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    let mounted = true;
 
-  if (loading) {
+    const init = async () => {
+      setLoading(true);
+      const user = await userService.get();
+      if (!mounted) return;
+
+      if (!user) {
+        router.replace("/login");
+        setLoading(false);
+        return;
+      }
+
+      setAuthenticated(true);
+      await fetchData();
+    };
+
+    void init();
+    return () => {
+      mounted = false;
+    };
+  }, [router]);
+
+  if (loading || !authenticated) {
     return (
       <div className="flex flex-1 flex-col">
-        <PageHeader
-          title="Dashboard"
-          description="Organization-wide KPIs, hiring momentum, and drive trends"
-        />
         <PageSection>
           <div className="h-[250px] rounded-lg bg-primary/5" />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -65,10 +85,6 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <PageHeader
-        title="Dashboard"
-        description="Organization-wide KPIs, hiring momentum, and drive trends"
-      />
       <PageSection>
         <CompanyOverviewAreaChart
           staff={staffData}
@@ -85,8 +101,6 @@ export default function Dashboard() {
             positiveLabel="Better growth this month"
             negativeLabel="Lower growth this month"
           />
-          <DepartmentStatCard data={staffData} />
-          <StatusConversionCard data={candidateData} />
           <GrowthStatsCard
             data={clientData}
             mode="clients"
@@ -96,8 +110,12 @@ export default function Dashboard() {
             positiveLabel="New clients acquired"
             negativeLabel="Acquisition needs attention"
           />
-          <StaffTenureCard data={staffData} />
           <OfferRateCard data={candidateData} />
+
+          <DepartmentStatCard data={staffData} />
+          <StatusConversionCard data={candidateData} />
+
+          <StaffTenureCard data={staffData} />
         </div>
       </PageSection>
     </div>

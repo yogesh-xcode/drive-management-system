@@ -2,7 +2,17 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Client } from "@/types";
 import dayjs from "dayjs";
-import { ReactNode } from "react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+
+function getInitials(value: string) {
+  return value
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+}
 
 export const programColumns: ColumnDef<Client>[] = [
   {
@@ -25,8 +35,17 @@ export const programColumns: ColumnDef<Client>[] = [
     accessorKey: "client",
     header: "Client",
     cell: ({ row }) => {
-      const rawVal = row.getValue("client");
-      return <div className="">{rawVal as ReactNode}</div>;
+      const clientName = String(row.getValue("client") ?? "");
+      return (
+        <div className="flex items-center gap-2">
+          <Avatar className="size-6">
+            <AvatarFallback className="text-[10px] font-medium">
+              {getInitials(clientName)}
+            </AvatarFallback>
+          </Avatar>
+          <span>{clientName}</span>
+        </div>
+      );
     },
   },
   {
@@ -35,6 +54,6 @@ export const programColumns: ColumnDef<Client>[] = [
   },
   {
     accessorKey: "contact",
-    header: "Contact",
+    header: () => <div className="-ml-5">Contact</div>,
   },
 ];

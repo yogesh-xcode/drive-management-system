@@ -165,7 +165,7 @@ export default function CompanyOverviewAreaChart({
   );
 
   return (
-    <Card className="mb-10 pt-0 bg-background shadow">
+    <Card className="mb-3 pt-0 bg-background shadow">
       <CardHeader className="flex items-center gap-2 space-y-0 border-b py-4 sm:flex-row">
         <div className="grid flex-1 gap-1">
           <CardTitle className="font-mono text-base md:text-lg">
@@ -204,7 +204,7 @@ export default function CompanyOverviewAreaChart({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
         >
-          <ResponsiveContainer width="100%" height={340}>
+          <ResponsiveContainer width="100%" height={285}>
             <AreaChart
               data={chartData}
               margin={{ left: 10, right: 20, top: 0, bottom: 0 }}

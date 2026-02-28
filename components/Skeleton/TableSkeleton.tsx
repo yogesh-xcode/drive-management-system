@@ -1,33 +1,27 @@
 export default function TableSkeleton({ rows = 8, columns = 5 }) {
   return (
-    <div className="w-full animate-pulse">
-      {/* Table header */}
-      <div className="bg-card rounded-t-lg p-3 flex gap-3 justify-around">
+    <div className="w-full animate-pulse rounded-lg border bg-card">
+      <div className="grid grid-cols-5 gap-3 border-b px-4 py-3">
         {[...Array(columns)].map((_, i) => (
-          <div key={i} className="h-4 w-24 bg-primary/10 rounded text-center" />
+          <div key={i} className="h-4 w-20 rounded bg-primary/10 md:w-28" />
         ))}
       </div>
-      {/* Table rows */}
       {[...Array(rows)].map((_, rowIdx) => (
         <div
           key={rowIdx}
-          className="bg-background border-t px-3 py-3 flex gap-3 items-center justify-around"
+          className="grid grid-cols-5 gap-3 border-b px-4 py-3 last:border-b-0"
         >
           {[...Array(columns)].map((_, colIdx) => (
-            <div
-              key={colIdx}
-              className="h-4 w-24 bg-primary/10 rounded text-center"
-            />
+            <div key={colIdx} className="h-4 w-20 rounded bg-primary/10 md:w-28" />
           ))}
         </div>
       ))}
-      {/* Pagination skeleton */}
-      <div className="flex justify-center items-center gap-2 py-4">
-        <div className="h-8 w-20 bg-primary/10 rounded-md animate-pulse" />
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className="h-8 w-8 bg-primary/10 rounded-md" />
+      <div className="flex items-center justify-end gap-2 border-t px-4 py-3">
+        <div className="h-8 w-20 rounded-md bg-primary/10" />
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-8 w-8 rounded-md bg-primary/10" />
         ))}
-        <div className="h-8 w-20 bg-primary/10 rounded-md animate-pulse" />
+        <div className="h-8 w-20 rounded-md bg-primary/10" />
       </div>
     </div>
   );
