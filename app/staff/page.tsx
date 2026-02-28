@@ -9,6 +9,7 @@ import CardCover from "@/components/Cards/CardCover";
 import DashboardCard from "@/components/Cards/DashboardCard";
 import DepartmentStatCard from "@/components/Cards/Staff/DepartmentStatCard";
 import TenureStatCard from "@/components/Cards/Staff/StaffTenureCard";
+import StaffCountCard from "@/components/Cards/Staff/StaffCountCard";
 import PageSkeleton from "@/components/Skeleton/PageSkeleton";
 import { useRouter } from "next/navigation";
 import { PageHeader, PageSection } from "@/components/layout/PageHeader";
@@ -72,6 +73,7 @@ export default function Page() {
           <CardCover>
             <DepartmentStatCard data={staffData} />
             <TenureStatCard data={staffData} />
+            <StaffCountCard data={staffData} />
             <DashboardCard />
           </CardCover>
           <PaginatedDataTable<Staff>
@@ -93,7 +95,7 @@ export default function Page() {
             }}
             title="Staff"
             entity="staff"
-            rowsPerPage={10}
+            rowsPerPage={8}
             loading={loading}
             immutableFields={["id"]}
           />

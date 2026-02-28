@@ -8,6 +8,7 @@ import React, { useEffect, useState } from "react";
 import CardCover from "@/components/Cards/CardCover";
 import DashboardCard from "@/components/Cards/DashboardCard";
 import { GrowthStatsCard } from "@/components/Cards/Client/GrowthStatsCard";
+import { OpeningsStatsCard } from "@/components/Cards/Client/OpeningsStatsCard";
 import { useRouter } from "next/navigation";
 import PageSkeleton from "@/components/Skeleton/PageSkeleton";
 import { PageHeader, PageSection } from "@/components/layout/PageHeader";
@@ -86,6 +87,7 @@ export default function Page() {
               positiveLabel="New clients acquired"
               negativeLabel="Acquisition needs attention"
             />
+            <OpeningsStatsCard data={clientData} />
             <DashboardCard />
           </CardCover>
           <PaginatedDataTable<Client>
@@ -107,7 +109,7 @@ export default function Page() {
             }}
             title="Programs"
             entity="client"
-            rowsPerPage={10}
+            rowsPerPage={8}
             loading={loading}
             immutableFields={["programNo"]}
           />

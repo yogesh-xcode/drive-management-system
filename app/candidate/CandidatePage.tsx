@@ -7,6 +7,7 @@ import { candidateFields } from "@/components/EntityTable/schema";
 import { Candidate } from "@/types";
 import { StatusConversionCard } from "@/components/Cards/Candidate/StatusConversionCard";
 import { OfferRateCard } from "@/components/Cards/Candidate/OfferRateCard";
+import { ApplicationVelocityCard } from "@/components/Cards/Candidate/ApplicationVelocityCard";
 import CardCover from "@/components/Cards/CardCover";
 import DashboardCard from "@/components/Cards/DashboardCard";
 import PageSkeleton from "@/components/Skeleton/PageSkeleton";
@@ -81,6 +82,7 @@ export default function Page() {
           <CardCover>
             <StatusConversionCard data={candidateData} />
             <OfferRateCard data={candidateData} />
+            <ApplicationVelocityCard data={candidateData} />
             <DashboardCard />
           </CardCover>
 
@@ -105,7 +107,7 @@ export default function Page() {
             }}
             title="Candidate"
             entity="candidate"
-            rowsPerPage={10}
+            rowsPerPage={8}
             loading={loading}
             immutableFields={["id"]}
             // 🔹 Controlled open state for Quick Create
