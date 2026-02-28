@@ -47,10 +47,6 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="flex flex-1 flex-col">
-        <PageHeader
-          title="Dashboard"
-          description="Organization-wide KPIs, hiring momentum, and drive trends"
-        />
         <PageSection>
           <div className="h-[250px] rounded-lg bg-primary/5" />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -65,10 +61,6 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <PageHeader
-        title="Dashboard"
-        description="Organization-wide KPIs, hiring momentum, and drive trends"
-      />
       <PageSection>
         <CompanyOverviewAreaChart
           staff={staffData}
@@ -85,8 +77,6 @@ export default function Dashboard() {
             positiveLabel="Better growth this month"
             negativeLabel="Lower growth this month"
           />
-          <DepartmentStatCard data={staffData} />
-          <StatusConversionCard data={candidateData} />
           <GrowthStatsCard
             data={clientData}
             mode="clients"
@@ -96,8 +86,12 @@ export default function Dashboard() {
             positiveLabel="New clients acquired"
             negativeLabel="Acquisition needs attention"
           />
-          <StaffTenureCard data={staffData} />
           <OfferRateCard data={candidateData} />
+
+          <DepartmentStatCard data={staffData} />
+          <StatusConversionCard data={candidateData} />
+
+          <StaffTenureCard data={staffData} />
         </div>
       </PageSection>
     </div>

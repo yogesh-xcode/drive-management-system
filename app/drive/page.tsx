@@ -10,12 +10,23 @@ import DashboardCard from "@/components/Cards/DashboardCard";
 import { DriveStatsCard } from "@/components/Cards/Drive/StatCard";
 import { useRouter } from "next/navigation";
 import { PageHeader, PageSection } from "@/components/layout/PageHeader";
+import { FileUploadDialog } from "@/components/FileUploadDialog";
 
 export default function Page() {
   const [driveData, setDriveData] = React.useState<Drive[]>([]);
   const [loading, setLoading] = React.useState(true);
 
   const router = useRouter();
+
+  const isDuplicateError = (error: unknown) => {
+    const message = error instanceof Error ? error.message : String(error);
+    const normalized = message.toLowerCase();
+    return (
+      normalized.includes("duplicate") ||
+      normalized.includes("unique constraint") ||
+      normalized.includes("already exists")
+    );
+  };
 
   async function fetchData() {
     setLoading(true);
@@ -52,10 +63,6 @@ export default function Page() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <PageHeader
-        title="Drives"
-        description="Schedule, monitor, and analyze hiring drive execution"
-      />
       <div className="@container/main flex flex-1 flex-col">
         <PageSection>
           <CardCover>
@@ -63,6 +70,11 @@ export default function Page() {
             <DriveStatsCard
               data={driveData}
               type="scheduled"
+              description={""}
+            />
+            <DriveStatsCard
+              data={driveData}
+              type="completed"
               description={""}
             />
             <DashboardCard />
@@ -86,9 +98,35 @@ export default function Page() {
             }}
             title="Drives"
             entity="drive"
-            rowsPerPage={10}
+            rowsPerPage={8}
             loading={loading}
             immutableFields={["id"]}
+            toolbarBeforeExport={
+              <FileUploadDialog
+                entityLabel="Drive"
+                fields={driveFields}
+                onImportRows={async (rows) => {
+                  let inserted = 0;
+                  let skipped = 0;
+
+                  for (const row of rows) {
+                    try {
+                      await driveDataService.create(row as Omit<Drive, "id">);
+                      inserted += 1;
+                    } catch (error) {
+                      if (isDuplicateError(error)) {
+                        skipped += 1;
+                        continue;
+                      }
+                      throw error;
+                    }
+                  }
+
+                  await fetchData();
+                  return { inserted, skipped };
+                }}
+              />
+            }
           />
         </PageSection>
       </div>
