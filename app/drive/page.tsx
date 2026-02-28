@@ -9,22 +9,29 @@ import CardCover from "@/components/Cards/CardCover";
 import DashboardCard from "@/components/Cards/DashboardCard";
 import { DriveStatsCard } from "@/components/Cards/Drive/StatCard";
 import { useRouter } from "next/navigation";
-import { PageHeader, PageSection } from "@/components/layout/PageHeader";
+import { PageSection } from "@/components/layout/PageHeader";
 import { FileUploadDialog } from "@/components/FileUploadDialog";
+import PageSkeleton from "@/components/Skeleton/PageSkeleton";
 
 export default function Page() {
+  const [authenticated, setAuthenticated] = React.useState(false);
   const [driveData, setDriveData] = React.useState<Drive[]>([]);
   const [loading, setLoading] = React.useState(true);
 
   const router = useRouter();
+  const normalizeValue = (value: unknown) =>
+    String(value ?? "").trim().toLowerCase();
 
-  const isDuplicateError = (error: unknown) => {
-    const message = error instanceof Error ? error.message : String(error);
-    const normalized = message.toLowerCase();
-    return (
-      normalized.includes("duplicate") ||
-      normalized.includes("unique constraint") ||
-      normalized.includes("already exists")
+  const isSameRow = (
+    existing: Record<string, unknown>,
+    incoming: Record<string, unknown>,
+  ) => {
+    const comparableKeys = Object.keys(incoming).filter(
+      (key) => key !== "id" && key !== "user_id" && key !== "id_uuid",
+    );
+
+    return comparableKeys.every(
+      (key) => normalizeValue(existing[key]) === normalizeValue(incoming[key]),
     );
   };
 
@@ -49,6 +56,7 @@ export default function Page() {
         return;
       }
 
+      setAuthenticated(true);
       const result = await driveDataService.get();
       if (!mounted) return;
       setDriveData(result.data || []);
@@ -60,6 +68,10 @@ export default function Page() {
       mounted = false;
     };
   }, [router]);
+
+  if (loading || !authenticated) {
+    return <PageSkeleton />;
+  }
 
   return (
     <div className="flex flex-1 flex-col">
@@ -108,16 +120,23 @@ export default function Page() {
                 onImportRows={async (rows) => {
                   let inserted = 0;
                   let skipped = 0;
+                  const existingResult = await driveDataService.get();
+                  const existingRows = (existingResult.data ?? []) as Record<
+                    string,
+                    unknown
+                  >[];
 
                   for (const row of rows) {
+                    if (existingRows.some((existing) => isSameRow(existing, row))) {
+                      skipped += 1;
+                      continue;
+                    }
+
                     try {
                       await driveDataService.create(row as Omit<Drive, "id">);
                       inserted += 1;
+                      existingRows.push(row);
                     } catch (error) {
-                      if (isDuplicateError(error)) {
-                        skipped += 1;
-                        continue;
-                      }
                       throw error;
                     }
                   }

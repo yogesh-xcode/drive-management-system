@@ -11,7 +11,8 @@ import { GrowthStatsCard } from "@/components/Cards/Client/GrowthStatsCard";
 import { OpeningsStatsCard } from "@/components/Cards/Client/OpeningsStatsCard";
 import { useRouter } from "next/navigation";
 import PageSkeleton from "@/components/Skeleton/PageSkeleton";
-import { PageHeader, PageSection } from "@/components/layout/PageHeader";
+import { PageSection } from "@/components/layout/PageHeader";
+import { FileUploadDialog } from "@/components/FileUploadDialog";
 
 export default function Page() {
   const [authenticated, setAuthenticated] = useState(false);
@@ -19,6 +20,21 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
 
   const router = useRouter();
+  const normalizeValue = (value: unknown) =>
+    String(value ?? "").trim().toLowerCase();
+
+  const isSameRow = (
+    existing: Record<string, unknown>,
+    incoming: Record<string, unknown>,
+  ) => {
+    const comparableKeys = Object.keys(incoming).filter(
+      (key) => key !== "id" && key !== "user_id" && key !== "id_uuid",
+    );
+
+    return comparableKeys.every(
+      (key) => normalizeValue(existing[key]) === normalizeValue(incoming[key]),
+    );
+  };
 
   async function fetchData() {
     try {
@@ -63,10 +79,6 @@ export default function Page() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <PageHeader
-        title="Client Programs"
-        description="Track program volume, client growth, and contact pipelines"
-      />
       <div className="@container/main flex flex-1 flex-col">
         <PageSection>
           <CardCover>
@@ -112,6 +124,39 @@ export default function Page() {
             rowsPerPage={8}
             loading={loading}
             immutableFields={["programNo"]}
+            toolbarBeforeExport={
+              <FileUploadDialog
+                entityLabel="Client"
+                fields={programFields}
+                onImportRows={async (rows) => {
+                  let inserted = 0;
+                  let skipped = 0;
+                  const existingResult = await clientDataService.get();
+                  const existingRows = (existingResult.data ?? []) as Record<
+                    string,
+                    unknown
+                  >[];
+
+                  for (const row of rows) {
+                    if (existingRows.some((existing) => isSameRow(existing, row))) {
+                      skipped += 1;
+                      continue;
+                    }
+
+                    try {
+                      await clientDataService.create(row as Omit<Client, "id">);
+                      inserted += 1;
+                      existingRows.push(row);
+                    } catch (error) {
+                      throw error;
+                    }
+                  }
+
+                  await fetchData();
+                  return { inserted, skipped };
+                }}
+              />
+            }
           />
         </PageSection>
       </div>
