@@ -18,6 +18,7 @@ import {
   IconArrowsSort,
   IconChevronDown,
   IconChevronUp,
+  IconPrinter,
   IconTrash,
   IconX,
 } from "@tabler/icons-react";
@@ -104,6 +105,26 @@ function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
   if (typeof error === "string") return error;
   return "Operation failed. Please try again.";
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function formatPrintValue(type: ColumnMeta["type"], value: unknown): string {
+  if (value === null || value === undefined || value === "") return "-";
+  if (type === "date") {
+    const date = new Date(String(value));
+    if (!Number.isNaN(date.getTime())) {
+      return date.toLocaleDateString("en-GB");
+    }
+  }
+  return String(value);
 }
 
 function buildColumnMeta<T extends Record<string, any>>(
@@ -498,6 +519,163 @@ export function PaginatedDataTable<T extends Record<string, any>>({
   const tableColCount =
     table.getVisibleLeafColumns().length + (hasActions ? 1 : 0) + 1;
 
+  const printableColumns = useMemo(
+    () => columnMeta.filter((col) => visibleIds.has(col.id)),
+    [columnMeta, visibleIds],
+  );
+
+  const handlePrint = () => {
+    if (filteredData.length === 0) {
+      setActionError("No rows available to print.");
+      return;
+    }
+
+    const titleText = `${title} Report`;
+    const printedAt = new Date().toLocaleString("en-GB");
+    const headers = printableColumns
+      .map((col) => `<th>${escapeHtml(col.label)}</th>`)
+      .join("");
+
+    const rowsHtml = filteredData
+      .map((row) => {
+        const cells = printableColumns
+          .map((col) => {
+            const value = formatPrintValue(col.type, row[col.id]);
+            return `<td>${escapeHtml(value)}</td>`;
+          })
+          .join("");
+        return `<tr>${cells}</tr>`;
+      })
+      .join("");
+
+    const html = `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>${escapeHtml(titleText)}</title>
+    <style>
+      @page { size: A4 landscape; margin: 16mm; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Arial, sans-serif;
+        color: #1f2937;
+        background: #ffffff;
+      }
+      .watermark {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        z-index: 2;
+      }
+      .watermark span {
+        color: rgba(107, 114, 128, 0.08);
+        font-size: 84px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        transform: rotate(-28deg);
+        filter: blur(2.4px);
+      }
+      .content {
+        position: relative;
+        z-index: 1;
+      }
+      .header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+      h1 {
+        font-size: 20px;
+        margin: 0;
+      }
+      .meta {
+        color: #6b7280;
+        font-size: 12px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        border: 1px solid #d1d5db;
+        font-size: 12px;
+      }
+      thead th {
+        background: #f3f4f6;
+        text-align: left;
+        font-weight: 700;
+        border: 1px solid #d1d5db;
+        padding: 8px;
+      }
+      tbody td {
+        border: 1px solid #e5e7eb;
+        padding: 7px 8px;
+        vertical-align: top;
+      }
+      tbody tr:nth-child(even) td {
+        background: #fafafa;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="watermark"><span>◉ DRIVEMS SUITE</span></div>
+    <div class="content">
+      <div class="header">
+        <h1>${escapeHtml(titleText)}</h1>
+        <div class="meta">Printed: ${escapeHtml(printedAt)}</div>
+      </div>
+      <table>
+        <thead><tr>${headers}</tr></thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>
+    </div>
+    <script>
+      window.onload = function () {
+        window.print();
+      };
+    </script>
+  </body>
+</html>`;
+
+    const iframe = document.createElement("iframe");
+    iframe.style.position = "fixed";
+    iframe.style.right = "0";
+    iframe.style.bottom = "0";
+    iframe.style.width = "0";
+    iframe.style.height = "0";
+    iframe.style.border = "0";
+    iframe.setAttribute("aria-hidden", "true");
+    document.body.appendChild(iframe);
+
+    const iframeDoc = iframe.contentDocument;
+    const iframeWindow = iframe.contentWindow;
+    if (!iframeDoc || !iframeWindow) {
+      document.body.removeChild(iframe);
+      setActionError("Unable to prepare print preview.");
+      return;
+    }
+
+    iframeDoc.open();
+    iframeDoc.write(html);
+    iframeDoc.close();
+
+    const cleanup = () => {
+      if (iframe.parentNode) {
+        iframe.parentNode.removeChild(iframe);
+      }
+    };
+
+    iframeWindow.onafterprint = cleanup;
+    iframeWindow.focus();
+    iframeWindow.print();
+    setTimeout(cleanup, 1000);
+  };
+
   return (
     <div className="ml-5.5 flex w-[95.5%] flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -735,6 +913,11 @@ export function PaginatedDataTable<T extends Record<string, any>>({
           )}
 
           {toolbarBeforeExport}
+
+          <Button variant="outline" size="sm" type="button" onClick={handlePrint}>
+            <IconPrinter size={16} />
+            Print
+          </Button>
 
           <ExportButton entity={entity} />
         </div>
