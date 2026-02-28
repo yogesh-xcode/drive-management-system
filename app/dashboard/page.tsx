@@ -15,7 +15,7 @@ import {
 } from "@/lib/repositories";
 import CompanyOverviewAreaChart from "@/components/Chart/CompanyOverviewChart";
 import { DashboardSkeleten } from "@/components/Skeleton/DashboardSkeleten";
-import { PageHeader, PageSection } from "@/components/layout/PageHeader";
+import { PageSection } from "@/components/layout/PageHeader";
 import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
