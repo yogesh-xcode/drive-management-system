@@ -2,6 +2,7 @@
 
 import { Upload } from "lucide-react";
 import Papa from "papaparse";
+import { useState } from "react";
 
 import FileUpload04 from "@/components/file-upload-04";
 import type { FieldDef } from "@/components/SidePeak";
@@ -138,6 +139,8 @@ export function FileUploadDialog({
   fields,
   onImportRows,
 }: FileUploadDialogProps) {
+  const [open, setOpen] = useState(false);
+
   const handleUploadFile = async (file: globalThis.File) => {
     const extension = file.name.split(".").pop()?.toLowerCase();
     if (extension !== "csv") {
@@ -159,7 +162,7 @@ export function FileUploadDialog({
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button type="button" variant="outline" size="sm">
           <Upload className="h-4 w-4" />
@@ -173,7 +176,10 @@ export function FileUploadDialog({
             Import CSV rows for {entityLabel.toLowerCase()} records into Supabase.
           </DialogDescription>
         </DialogHeader>
-        <FileUpload04 onUploadFile={handleUploadFile} />
+        <FileUpload04
+          onUploadFile={handleUploadFile}
+          onUploadComplete={() => setOpen(false)}
+        />
       </DialogContent>
     </Dialog>
   );

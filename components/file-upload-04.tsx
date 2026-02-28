@@ -15,16 +15,22 @@ type UploadSummary = {
 
 type FileUpload04Props = {
   onUploadFile: (file: globalThis.File) => Promise<UploadSummary>;
+  onUploadComplete?: () => void;
 };
 
-export default function FileUpload04({ onUploadFile }: FileUpload04Props) {
+export default function FileUpload04({
+  onUploadFile,
+  onUploadComplete,
+}: FileUpload04Props) {
   const [uploadState, setUploadState] = useState<{
     file: globalThis.File | null;
     progress: number;
+    preparing: boolean;
     uploading: boolean;
   }>({
     file: null,
     progress: 0,
+    preparing: false,
     uploading: false,
   });
   const [inlineError, setInlineError] = useState<string | null>(null);
@@ -36,11 +42,30 @@ export default function FileUpload04({ onUploadFile }: FileUpload04Props) {
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   ];
 
+  const simulatePreparation = (file: globalThis.File) => {
+    setUploadState({ file, progress: 0, preparing: true, uploading: false });
+
+    let current = 0;
+    const tick = () => {
+      current = Math.min(current + Math.floor(Math.random() * 18) + 10, 100);
+      setUploadState((prev) => ({ ...prev, progress: current }));
+
+      if (current >= 100) {
+        setUploadState((prev) => ({ ...prev, preparing: false }));
+        return;
+      }
+
+      setTimeout(tick, 90);
+    };
+
+    setTimeout(tick, 90);
+  };
+
   const handleFile = (file: globalThis.File | undefined) => {
     if (!file) return;
 
     if (validFileTypes.includes(file.type)) {
-      setUploadState({ file, progress: 0, uploading: false });
+      simulatePreparation(file);
       setInlineError(null);
     } else {
       toast.error("Please upload a CSV, XLSX, or XLS file.", {
@@ -60,7 +85,7 @@ export default function FileUpload04({ onUploadFile }: FileUpload04Props) {
   };
 
   const resetFile = () => {
-    setUploadState({ file: null, progress: 0, uploading: false });
+    setUploadState({ file: null, progress: 0, preparing: false, uploading: false });
     setInlineError(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -86,20 +111,25 @@ export default function FileUpload04({ onUploadFile }: FileUpload04Props) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
   };
 
-  const { file, progress, uploading } = uploadState;
+  const { file, progress, preparing, uploading } = uploadState;
 
   const handleUpload = async () => {
-    if (!file || uploading) return;
+    if (!file || uploading || preparing || progress < 100) return;
 
     setInlineError(null);
-    setUploadState((prev) => ({ ...prev, uploading: true, progress: 20 }));
+    setUploadState((prev) => ({ ...prev, uploading: true }));
 
     try {
       const result = await onUploadFile(file);
       setUploadState((prev) => ({ ...prev, uploading: false, progress: 100 }));
 
       const skipped = result.skipped ?? 0;
-      if (skipped > 0) {
+      if (result.inserted === 0 && skipped > 0) {
+        toast.warning(`No new rows imported. Skipped ${skipped} duplicate row(s).`, {
+          position: "bottom-right",
+          duration: 3500,
+        });
+      } else if (skipped > 0) {
         toast.success(
           `Imported ${result.inserted} row(s). Skipped ${skipped} row(s).`,
           {
@@ -113,10 +143,13 @@ export default function FileUpload04({ onUploadFile }: FileUpload04Props) {
           duration: 3000,
         });
       }
+
+      onUploadComplete?.();
+      resetFile();
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Upload failed. Please try again.";
-      setUploadState((prev) => ({ ...prev, uploading: false, progress: 0 }));
+      setUploadState((prev) => ({ ...prev, uploading: false }));
 
       const normalized = message.toLowerCase();
       if (
@@ -127,10 +160,18 @@ export default function FileUpload04({ onUploadFile }: FileUpload04Props) {
         setInlineError(
           "Duplicate file data detected. Some records already exist in Supabase.",
         );
+        toast.error("Duplicate records detected. Some rows were already present.", {
+          position: "bottom-right",
+          duration: 3500,
+        });
         return;
       }
 
       setInlineError(message);
+      toast.error(message, {
+        position: "bottom-right",
+        duration: 3500,
+      });
     }
   };
 
@@ -231,9 +272,13 @@ export default function FileUpload04({ onUploadFile }: FileUpload04Props) {
           <Button
             type="submit"
             className="whitespace-nowrap"
-            disabled={!file || uploading}
+            disabled={!file || uploading || preparing || progress < 100}
           >
-            {uploading ? "Uploading..." : "Upload"}
+            {uploading
+              ? "Uploading..."
+              : preparing || progress < 100
+                ? "Preparing..."
+                : "Upload"}
           </Button>
         </div>
         {inlineError && (
