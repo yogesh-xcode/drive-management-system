@@ -7,6 +7,7 @@ import {
   IconDashboard,
   IconInnerShadowTop,
   IconListDetails,
+  IconReportAnalytics,
   IconUsersGroup,
 } from "@tabler/icons-react";
 
@@ -53,7 +54,7 @@ const data = {
     {
       title: "Reports",
       url: "/reports",
-      icon: IconBriefcase,
+      icon: IconReportAnalytics,
     },
   ],
 };
