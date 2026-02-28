@@ -1,20 +1,22 @@
 "use client";
-import { useState } from "react";
-import { supabase } from "@/lib/subabase";
+
+import { useCallback, useState } from "react";
+import { useRouter } from "next/navigation";
+import { IconBrandGoogleFilled, IconBrandWindows } from "@tabler/icons-react";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  ArrowRight,
+  Eye,
+  EyeOff,
+  Lock,
+  Mail,
+} from "lucide-react";
+
+import Auth from "@/lib/auth/auth";
+import { supabase } from "@/lib/subabase";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
-import { IconBrandGoogleFilled, IconBrandWindows } from "@tabler/icons-react";
-import { useRouter } from "next/navigation";
-import Auth from "@/lib/auth/auth";
 import {
   Dialog,
   DialogContent,
@@ -23,7 +25,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { AnimatePresence, motion } from "framer-motion";
 
 export function LoginForm({
   className,
@@ -33,56 +34,50 @@ export function LoginForm({
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  // Dialog state for any feedback (success or error)
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMessage, setDialogMessage] = useState<string | null>(null);
-
   const router = useRouter();
 
-  // AUTH SUBMITS
-  const handleAuth = async (e: React.FormEvent) => {
+  const handleAuth = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    // Signup
     if (mode === "signup") {
-      const { data, error: supaError } = await Auth.signUp({
+      const { error } = await Auth.signUp({
         display_name: name,
         email,
         password,
       });
 
-      console.log(data);
-
-      if (supaError) {
-        setDialogMessage(supaError.message);
-      } else {
-        setDialogMessage(
-          "Account created! Please check your email for a confirmation link."
-        );
-      }
+      setDialogMessage(
+        error
+          ? error.message
+          : "Account created. Check your email for a confirmation link."
+      );
       setDialogOpen(true);
+      setLoading(false);
+      return;
     }
-    // Login
-    else if (mode === "login") {
-      const { error: supaError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (supaError) {
-        setDialogMessage(supaError.message);
-        setDialogOpen(true);
-      } else {
-        router.push("/dashboard");
-      }
-    }
-    setLoading(false);
-  };
 
-  // OAUTH
-  const handleOAuthLogin = async (provider: "google" | "azure") => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      setDialogMessage(error.message);
+      setDialogOpen(true);
+    } else {
+      router.push("/dashboard");
+    }
+
+    setLoading(false);
+  }, [email, name, password, mode, router]);
+
+  const handleOAuthLogin = useCallback(async (provider: "google" | "azure") => {
     setLoading(true);
     const { error } = await supabase.auth.signInWithOAuth({ provider });
     if (error) {
@@ -90,27 +85,26 @@ export function LoginForm({
       setDialogOpen(true);
     }
     setLoading(false);
-  };
+  }, []);
 
-  // FORGOT PASSWORD
-  const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
+  const handleForgotPasswordSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!email) {
-      setDialogMessage("Please enter your email to reset password.");
+      setDialogMessage("Please enter your email to reset your password.");
       setDialogOpen(true);
       return;
     }
-    setLoading(true);
-    await Auth.handleForgotPassword(email); // <--- real submit
-    setDialogMessage("Check your email for a password reset link.");
-    setLoading(false);
-    setDialogOpen(true);
-  };
 
-  // Animations for the card content
+    setLoading(true);
+    await Auth.handleForgotPassword(email);
+    setDialogMessage("Check your email for a password reset link.");
+    setDialogOpen(true);
+    setLoading(false);
+  }, [email]);
+
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      {/* Feedback dialog (modal) */}
+    <div className={cn("w-full", className)} {...props}>
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -123,250 +117,229 @@ export function LoginForm({
         </DialogContent>
       </Dialog>
 
-      <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">
-            {mode === "signup"
-              ? "Create Account"
-              : mode === "forgot"
-              ? "Reset Password"
-              : "Welcome back"}
-          </CardTitle>
-          <CardDescription>
-            {mode === "signup"
-              ? "Sign up with your Email and Password"
-              : mode === "forgot"
-              ? "Enter your email to receive a password reset link"
-              : "Login with your Email and Password"}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <AnimatePresence initial={false} mode="wait">
-            {/* LOGIN */}
-            {mode === "login" && (
-              <motion.form
-                key="login"
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -40 }}
-                transition={{ duration: 0.27, type: "tween" }}
-                onSubmit={handleAuth}
-                autoComplete="off"
-              >
-                <div className="grid gap-6">
-                  <div className="grid gap-6">
-                    <div className="grid gap-3">
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        autoComplete="email"
-                        placeholder="m@example.com"
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                      />
-                    </div>
-                    <div className="grid gap-3">
-                      <div className="flex items-center">
-                        <Label htmlFor="password">Password</Label>
-                        <button
-                          type="button"
-                          className="ml-auto text-sm underline-offset-4 hover:underline"
-                          onClick={() => {
-                            setMode("forgot");
-                          }}
-                        >
-                          Forgot your password?
-                        </button>
-                      </div>
-                      <Input
-                        id="password"
-                        type="password"
-                        autoComplete="current-password"
-                        required
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                      />
-                    </div>
-                    <Button type="submit" className="w-full" disabled={loading}>
-                      Login
-                    </Button>
-                  </div>
-                  <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-                    <span className="bg-card text-muted-foreground relative z-10 px-2">
-                      Or continue with
-                    </span>
-                  </div>
-                  <div className="flex justify-center space-x-10">
-                    <Button
-                      variant="outline"
-                      type="button"
-                      onClick={() => handleOAuthLogin("google")}
-                      disabled={loading}
-                    >
-                      Continue with <IconBrandGoogleFilled className="mr-2" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      type="button"
-                      onClick={() => handleOAuthLogin("azure")}
-                      disabled={loading}
-                    >
-                      Continue with <IconBrandWindows className="mr-2" />
-                    </Button>
-                  </div>
-                  <div className="text-center text-sm mt-3">
-                    Don&#39;t have an account?
-                    <button
-                      type="button"
-                      className="underline underline-offset-4 ml-2"
-                      onClick={() => {
-                        setMode("signup");
-                      }}
-                    >
-                      Sign up
-                    </button>
-                  </div>
-                </div>
-              </motion.form>
-            )}
+      {mode === "login" ? (
+        <form onSubmit={handleAuth} className="space-y-3" autoComplete="off">
+          <h1 className="text-xl font-extrabold text-foreground sm:text-2xl">
+            Welcome Back
+          </h1>
+          <p className="text-xs text-muted-foreground sm:text-sm">
+            Sign in to manage drives, candidates, staff, and client programs.
+          </p>
 
-            {/* SIGNUP */}
-            {mode === "signup" && (
-              <motion.form
-                key="signup"
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -40 }}
-                transition={{ duration: 0.27, type: "tween" }}
-                onSubmit={handleAuth}
-                autoComplete="off"
-              >
-                <div className="grid gap-6">
-                  <div className="grid gap-6">
-                    <div className="grid gap-3">
-                      <Label htmlFor="name">Full Name</Label>
-                      <Input
-                        id="name"
-                        type="text"
-                        autoComplete="name"
-                        placeholder="Your Name"
-                        required
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                      />
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        autoComplete="email"
-                        placeholder="m@example.com"
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                      />
-                    </div>
-                    <div className="grid gap-3">
-                      <div className="flex items-center">
-                        <Label htmlFor="password">Password</Label>
-                      </div>
-                      <Input
-                        id="password"
-                        type="password"
-                        autoComplete="new-password"
-                        required
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                      />
-                    </div>
-                    <Button type="submit" className="w-full" disabled={loading}>
-                      Sign up
-                    </Button>
-                  </div>
-                  <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-                    <span className="bg-card text-muted-foreground relative z-10 px-2">
-                      Or continue with
-                    </span>
-                  </div>
-                  <div className="flex justify-center space-x-10">
-                    <Button
-                      variant="outline"
-                      type="button"
-                      onClick={() => handleOAuthLogin("google")}
-                      disabled={loading}
-                    >
-                      Continue with <IconBrandGoogleFilled className="mr-2" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      type="button"
-                      onClick={() => handleOAuthLogin("azure")}
-                      disabled={loading}
-                    >
-                      Continue with <IconBrandWindows className="mr-2" />
-                    </Button>
-                  </div>
-                  <div className="text-center text-sm mt-3">
-                    Already have an account?
-                    <button
-                      type="button"
-                      className="underline underline-offset-4 ml-2"
-                      onClick={() => {
-                        setMode("login");
-                      }}
-                    >
-                      Login
-                    </button>
-                  </div>
-                </div>
-              </motion.form>
-            )}
+          <div className="space-y-1.5 pt-0.5">
+            <Label htmlFor="email" className="text-[11px] font-bold text-foreground">
+              Email Address
+            </Label>
+            <div className="flex items-center gap-2.5 rounded-lg border border-border bg-muted/45 px-2.5 py-1.5">
+              <Mail className="size-3.5 text-muted-foreground" />
+              <Input
+                id="email"
+                type="email"
+                placeholder="name@company.com"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="h-auto border-0 bg-transparent p-0 text-xs text-foreground shadow-none focus-visible:ring-0"
+              />
+            </div>
+          </div>
 
-            {/* FORGOT PASSWORD */}
-            {mode === "forgot" && (
-              <motion.form
-                key="forgot"
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -40 }}
-                transition={{ duration: 0.27, type: "tween" }}
-                onSubmit={handleForgotPasswordSubmit} // <--- USE CORRECT HANDLER
-                autoComplete="off"
+          <div className="space-y-1.5">
+            <Label htmlFor="password" className="text-[11px] font-bold text-foreground">
+              Password
+            </Label>
+            <div className="flex items-center gap-2.5 rounded-lg border border-border bg-muted/45 px-2.5 py-1.5">
+              <Lock className="size-3.5 text-muted-foreground" />
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                required
+                value={password}
+                placeholder="Enter your secure password"
+                onChange={(e) => setPassword(e.target.value)}
+                className="h-auto border-0 bg-transparent p-0 text-xs text-foreground shadow-none focus-visible:ring-0"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="text-muted-foreground hover:text-foreground"
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
-                <div className="grid gap-6">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    autoComplete="email"
-                    placeholder="m@example.com"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    Send reset link
-                  </Button>
-                  <div className="text-center text-sm mt-3">
-                    <button
-                      type="button"
-                      className="underline underline-offset-4"
-                      onClick={() => setMode("login")}
-                    >
-                      Back to login
-                    </button>
-                  </div>
-                </div>
-              </motion.form>
-            )}
-          </AnimatePresence>
-        </CardContent>
-      </Card>
-      <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
-      </div>
+                {showPassword ? (
+                  <EyeOff className="size-3.5" />
+                ) : (
+                  <Eye className="size-3.5" />
+                )}
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between gap-2 text-[11px]">
+            <label className="inline-flex items-center gap-1.5 text-foreground">
+              <input
+                type="checkbox"
+                className="size-3.5 rounded border border-border bg-background accent-primary"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+              />
+              Remember me for 30 days
+            </label>
+            <button
+              type="button"
+              onClick={() => setMode("forgot")}
+              className="font-semibold text-primary hover:underline"
+            >
+              Forgot Password?
+            </button>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2 text-xs font-bold text-primary-foreground shadow-md transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Sign In to Dashboard
+            <ArrowRight className="size-3.5" />
+          </button>
+
+          <div className="border-t border-border pt-2.5">
+            <p className="mb-2.5 text-center text-[11px] text-muted-foreground">
+              Alternate sign-in options
+            </p>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <Button
+                variant="outline"
+                type="button"
+                className="h-8 w-full justify-center gap-1.5 text-xs"
+                onClick={() => handleOAuthLogin("google")}
+                disabled={loading}
+              >
+                <IconBrandGoogleFilled className="size-3.5" />
+                Google
+              </Button>
+              <Button
+                variant="outline"
+                type="button"
+                className="h-8 w-full justify-center gap-1.5 text-xs"
+                onClick={() => handleOAuthLogin("azure")}
+                disabled={loading}
+              >
+                <IconBrandWindows className="size-3.5" />
+                Microsoft
+              </Button>
+            </div>
+            <p className="mt-2.5 text-center text-[11px] text-muted-foreground">
+              Don&apos;t have an account?{" "}
+              <button
+                type="button"
+                className="font-semibold text-primary hover:underline"
+                onClick={() => setMode("signup")}
+              >
+                Create one
+              </button>
+            </p>
+          </div>
+        </form>
+      ) : null}
+
+      {mode === "signup" ? (
+        <form
+          onSubmit={handleAuth}
+          className="mx-auto w-full max-w-md space-y-3"
+          autoComplete="off"
+        >
+          <h1 className="text-2xl font-bold text-foreground">Create Account</h1>
+          <p className="text-sm text-muted-foreground">
+            Set up your DriveMS workspace access.
+          </p>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="name">Full Name</Label>
+            <Input
+              id="name"
+              type="text"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="email-signup">Email</Label>
+            <Input
+              id="email-signup"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="password-signup">Password</Label>
+            <Input
+              id="password-signup"
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+
+          <Button type="submit" className="w-full" disabled={loading}>
+            Create Account
+          </Button>
+
+          <p className="text-center text-xs text-muted-foreground">
+            Already have an account?{" "}
+            <button
+              type="button"
+              className="font-medium text-primary hover:underline"
+              onClick={() => setMode("login")}
+            >
+              Back to Login
+            </button>
+          </p>
+        </form>
+      ) : null}
+
+      {mode === "forgot" ? (
+        <form
+          onSubmit={handleForgotPasswordSubmit}
+          className="mx-auto w-full max-w-md space-y-3"
+          autoComplete="off"
+        >
+          <h1 className="text-2xl font-bold text-foreground">Reset Password</h1>
+          <p className="text-sm text-muted-foreground">
+            Enter your email to receive a password reset link.
+          </p>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="email-forgot">Email</Label>
+            <Input
+              id="email-forgot"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+
+          <Button type="submit" className="w-full" disabled={loading}>
+            Send Reset Link
+          </Button>
+
+          <p className="text-center text-xs text-muted-foreground">
+            <button
+              type="button"
+              className="font-medium text-primary hover:underline"
+              onClick={() => setMode("login")}
+            >
+              Back to Login
+            </button>
+          </p>
+        </form>
+      ) : null}
     </div>
   );
 }
