@@ -22,12 +22,15 @@ export function ExportButton({
       alert("Failed to fetch data!");
       return;
     }
-    const csv = Papa.unparse(data);
+    const exportRows = data.map((row: Record<string, unknown>) =>
+      Object.fromEntries(Object.entries(row).filter(([key]) => key !== "id")),
+    );
+    const csv = Papa.unparse(exportRows);
     saveAs(new Blob([csv], { type: "text/csv" }), fileName || `${entity}.csv`);
   }
 
   return (
-    <Button className="gap-1.5 text-sm bg-none" onClick={handleExport}>
+    <Button type="button" className="gap-1.5 text-sm bg-none" onClick={handleExport}>
       <IconTableExport /> {children || `Export ${entity}`}
     </Button>
   );

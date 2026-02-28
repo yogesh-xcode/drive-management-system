@@ -1,16 +1,57 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+
+import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import {
+  type ColumnDef,
   flexRender,
-  FilterFn,
   getCoreRowModel,
-  useReactTable,
-  getSortedRowModel,
   getFilteredRowModel,
-  SortingState,
-  ColumnDef,
-  ColumnFiltersState,
+  getPaginationRowModel,
+  getSortedRowModel,
+  type RowSelectionState,
+  type SortingState,
+  type VisibilityState,
+  useReactTable,
 } from "@tanstack/react-table";
+import {
+  IconAdjustmentsHorizontal,
+  IconArrowsSort,
+  IconChevronDown,
+  IconChevronUp,
+  IconTrash,
+  IconX,
+} from "@tabler/icons-react";
+import { useQueryState } from "nuqs";
+
+import { AddButton } from "@/components/Button/AddButton";
+import { ExportButton } from "@/components/Button/ExportButton";
+import { type FieldDef, SidePeak } from "@/components/SidePeak";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -19,35 +60,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-import { AnimatePresence, motion } from "framer-motion";
-import { Input } from "@/components/ui/input";
-import { AddButton } from "@/components/Button/AddButton";
-import { ExportButton } from "@/components/Button/ExportButton";
-import {
-  DateRangeFilterValue,
-  FilterButton,
-  FilterValue,
-} from "@/components/Button/FilterButton";
-import { SidePeak } from "@/components/SidePeak";
-import { Button } from "@/components/ui/button";
-import { IconX } from "@tabler/icons-react";
-import { cn } from "@/lib/utils";
 import { serviceMap } from "@/lib/repositories/services";
-import dayjs from "dayjs";
+import { cn } from "@/lib/utils";
 
 export interface PaginatedDataTableProps<T extends Record<string, any>> {
   columns: ColumnDef<T>[];
   data: T[];
   dateAccessor: string;
-  fields: any[];
+  fields: FieldDef[];
   onAdd?: (values: T) => Promise<void>;
   onEdit?: (row: T, values: T) => Promise<void>;
   onDelete?: (row: T) => Promise<void>;
@@ -56,37 +76,73 @@ export interface PaginatedDataTableProps<T extends Record<string, any>> {
   immutableFields?: string[];
   rowsPerPage?: number;
   loading?: boolean;
-
-  // ✅ Add these two props
   quickCreateOpen?: boolean;
   onQuickCreateOpenChange?: (open: boolean) => void;
+  toolbarBeforeExport?: ReactNode;
 }
 
-const FILTER_EXCLUDE_BY_ENTITY: Partial<
-  Record<keyof typeof serviceMap, string[]>
-> = {
-  candidate: ["fullName"],
-  client: ["opening", "contact"],
-  staff: ["name", "email"],
+type ColumnMeta = {
+  id: string;
+  label: string;
+  type: "text" | "number" | "date" | "select";
 };
 
-const DATE_RANGE_FILTER: FilterFn<any> = (row, columnId, filterValue) => {
-  const rawValue = row.getValue(columnId);
-  const rowDate = dayjs(rawValue as string | number | Date);
-  if (!rowDate.isValid()) return false;
-
-  const value = (filterValue || {}) as DateRangeFilterValue;
-
-  if (value.from && rowDate.isBefore(dayjs(value.from), "day")) {
-    return false;
+function safeJsonParse<T>(value: string): T | null {
+  try {
+    return JSON.parse(value) as T;
+  } catch {
+    return null;
   }
+}
 
-  if (value.to && rowDate.isAfter(dayjs(value.to), "day")) {
-    return false;
-  }
+function normalizeText(value: unknown): string {
+  if (value === null || value === undefined) return "";
+  return String(value).toLowerCase();
+}
 
-  return true;
-};
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "string") return error;
+  return "Operation failed. Please try again.";
+}
+
+function buildColumnMeta<T extends Record<string, any>>(
+  columns: ColumnDef<T>[],
+  fields: FieldDef[],
+  sampleData: T[],
+): ColumnMeta[] {
+  const fieldByName = new Map(fields.map((f) => [f.name, f]));
+
+  return columns
+    .map((col) => {
+      const accessorKey = (col as { accessorKey?: unknown }).accessorKey;
+      const id =
+        typeof col.id === "string"
+          ? col.id
+          : typeof accessorKey === "string"
+            ? accessorKey
+            : null;
+
+      if (!id) return null;
+
+      const field = fieldByName.get(id);
+      const headerLabel =
+        typeof col.header === "string" ? col.header : field?.label || id;
+
+      let type: ColumnMeta["type"] = "text";
+      if (field?.type === "date") type = "date";
+      else if (field?.type === "number") type = "number";
+      else if (field?.type === "select") type = "select";
+      else {
+        const sample = sampleData.find((row) => row[id] !== undefined)?.[id];
+        if (typeof sample === "number") type = "number";
+        else if (id.toLowerCase().includes("date")) type = "date";
+      }
+
+      return { id, label: headerLabel, type };
+    })
+    .filter((item): item is ColumnMeta => Boolean(item));
+}
 
 export function PaginatedDataTable<T extends Record<string, any>>({
   columns,
@@ -103,464 +159,858 @@ export function PaginatedDataTable<T extends Record<string, any>>({
   loading,
   quickCreateOpen,
   onQuickCreateOpenChange,
+  toolbarBeforeExport,
 }: PaginatedDataTableProps<T>) {
-  const [sorting, setSorting] = useState<SortingState>([
-    { id: dateAccessor, desc: true },
-  ]);
-  const [globalFilter, setGlobalFilter] = useState("");
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [editRow, setEditRow] = useState<T | null>(null);
-  const [page, setPage] = useState(1);
   const hasActions = Boolean(onEdit || onDelete);
 
-  const fieldTypeMap = useMemo(
+  const columnMeta = useMemo(
+    () => buildColumnMeta(columns, fields, data),
+    [columns, fields, data],
+  );
+
+  const filterModalColumns = useMemo(
     () =>
-      new Map(
-        (fields || [])
-          .filter((field: any) => field?.name)
-          .map((field: any) => [String(field.name), field?.type || "text"]),
+      columnMeta.filter(
+        (col) =>
+          col.id !== "id" &&
+          col.id !== "name" &&
+          col.id !== "fullName" &&
+          col.id !== "email" &&
+          col.id !== "contact" &&
+          col.id !== "programNo" &&
+          col.id !== "opening",
       ),
-    [fields],
+    [columnMeta],
   );
 
-  const isIdLikeField = (accessorKey: string) =>
-    accessorKey === "id" ||
-    accessorKey === "programNo" ||
-    accessorKey.toLowerCase().endsWith("id");
-
-  const isDateField = (accessorKey: string) =>
-    fieldTypeMap.get(accessorKey) === "date" ||
-    accessorKey.toLowerCase().includes("date");
-
-  const excludedFilterKeys = useMemo(
-    () => new Set(FILTER_EXCLUDE_BY_ENTITY[entity] || []),
-    [entity],
+  const columnIds = useMemo(() => columnMeta.map((c) => c.id), [columnMeta]);
+  const columnTypeById = useMemo(
+    () => new Map(columnMeta.map((c) => [c.id, c.type])),
+    [columnMeta],
   );
 
-  // Filter configs (dropdown/date); ID-like fields intentionally excluded
-  const filterableColumns = useMemo(
+  const defaultSort = `${dateAccessor}:desc`;
+
+  const [searchQuery, setSearchQuery] = useQueryState<string>(
+    `${entity}Search`,
+    {
+      parse: (v) => v ?? "",
+      serialize: (v) => v,
+      defaultValue: "",
+      clearOnDefault: true,
+      shallow: true,
+      history: "replace",
+    },
+  );
+
+  const [pageQuery, setPageQuery] = useQueryState<number>(`${entity}Page`, {
+    parse: (v) => {
+      const parsed = Number.parseInt(v, 10);
+      return Number.isNaN(parsed) || parsed < 1 ? null : parsed;
+    },
+    serialize: (v) => String(v),
+    defaultValue: 1,
+    clearOnDefault: true,
+    shallow: true,
+    history: "replace",
+  });
+
+  const [sortQuery, setSortQuery] = useQueryState<string>(`${entity}Sort`, {
+    parse: (v) => {
+      const [id, dir] = v.split(":");
+      if (!id || !columnIds.includes(id)) return defaultSort;
+      if (dir !== "asc" && dir !== "desc") return `${id}:asc`;
+      return `${id}:${dir}`;
+    },
+    serialize: (v) => v,
+    defaultValue: defaultSort,
+    clearOnDefault: true,
+    shallow: true,
+    history: "replace",
+  });
+
+  const [visibilityQuery, setVisibilityQuery] = useQueryState<string>(
+    `${entity}Columns`,
+    {
+      parse: (v) => v,
+      serialize: (v) => v,
+      defaultValue: "",
+      clearOnDefault: true,
+      shallow: true,
+      history: "replace",
+    },
+  );
+
+  const [filtersQuery, setFiltersQuery] = useQueryState<string>(
+    `${entity}Filters`,
+    {
+      parse: (v) => v,
+      serialize: (v) => v,
+      defaultValue: "",
+      clearOnDefault: true,
+      shallow: true,
+      history: "replace",
+    },
+  );
+
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [editRow, setEditRow] = useState<T | null>(null);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  const [draftFilterColumn, setDraftFilterColumn] = useState<string>("");
+  const [draftFilterValue, setDraftFilterValue] = useState<string>("");
+  const draftColumnMeta = useMemo(
     () =>
-      columns
-        .filter((col) => typeof (col as any).accessorKey === "string")
-        .map((col) => {
-          const accessorKey = String((col as any).accessorKey);
-          if (
-            isIdLikeField(accessorKey) ||
-            excludedFilterKeys.has(accessorKey)
-          ) {
-            return null;
-          }
-
-          const header =
-            typeof col.header === "string" ? col.header : accessorKey;
-
-          if (isDateField(accessorKey)) {
-            return { accessorKey, header, type: "date" as const };
-          }
-
-          const options = Array.from(
-            new Set(
-              data
-                .map((row) => row[accessorKey])
-                .filter((value) => value !== null && value !== undefined)
-                .map((value) => String(value).trim())
-                .filter((value) => value.length > 0),
-            ),
-          ).sort((a, b) => a.localeCompare(b));
-
-          return options.length > 0
-            ? {
-                accessorKey,
-                header,
-                type: "select" as const,
-                options,
-              }
-            : null;
-        })
-        .filter(Boolean),
-    [columns, data, fields, excludedFilterKeys],
+      filterModalColumns.find((col) => col.id === draftFilterColumn) ?? null,
+    [filterModalColumns, draftFilterColumn],
   );
 
-  const dateFilterKeys = useMemo(
-    () =>
-      new Set(
-        filterableColumns
-          .filter((col) => col?.type === "date")
-          .map((col) => col!.accessorKey),
-      ),
-    [filterableColumns],
+  const activeTextFilters = useMemo(() => {
+    if (!filtersQuery) return {} as Record<string, string>;
+    const parsed = safeJsonParse<Record<string, string>>(filtersQuery);
+    if (!parsed || typeof parsed !== "object")
+      return {} as Record<string, string>;
+
+    const normalized: Record<string, string> = {};
+    for (const [id, value] of Object.entries(parsed)) {
+      if (columnIds.includes(id) && value.trim()) {
+        normalized[id] = value.trim();
+      }
+    }
+    return normalized;
+  }, [filtersQuery, columnIds]);
+
+  const visibleIds = useMemo(() => {
+    if (!visibilityQuery) return new Set(columnIds);
+    const parsed = safeJsonParse<string[]>(visibilityQuery);
+    if (!Array.isArray(parsed) || parsed.length === 0)
+      return new Set(columnIds);
+    const valid = parsed.filter((id) => columnIds.includes(id));
+    return new Set(valid.length ? valid : columnIds);
+  }, [visibilityQuery, columnIds]);
+
+  const columnVisibility = useMemo<VisibilityState>(() => {
+    const state: VisibilityState = {};
+    for (const id of columnIds) state[id] = visibleIds.has(id);
+    return state;
+  }, [columnIds, visibleIds]);
+
+  const [sortId, sortDir] = sortQuery.split(":");
+  const sorting = useMemo<SortingState>(
+    () => [
+      {
+        id: columnIds.includes(sortId) ? sortId : dateAccessor,
+        desc: sortDir === "desc",
+      },
+    ],
+    [sortId, sortDir, columnIds, dateAccessor],
   );
 
-  const enhancedColumns = useMemo(
-    () =>
-      columns.map((col) => {
-        const accessorKey = (col as any).accessorKey;
-        if (
-          typeof accessorKey === "string" &&
-          dateFilterKeys.has(accessorKey)
-        ) {
-          return {
-            ...col,
-            filterFn: DATE_RANGE_FILTER,
-          };
-        }
-        return col;
-      }),
-    [columns, dateFilterKeys],
-  );
+  const filteredData = useMemo(() => {
+    const search = (searchQuery ?? "").trim().toLowerCase();
+    return data.filter((row) => {
+      if (search) {
+        const hit = columnIds.some((id) =>
+          normalizeText(row[id]).includes(search),
+        );
+        if (!hit) return false;
+      }
+      for (const [id, value] of Object.entries(activeTextFilters)) {
+        const cell = normalizeText(row[id]);
+        if (!cell.includes(value.toLowerCase())) return false;
+      }
+      return true;
+    });
+  }, [data, searchQuery, activeTextFilters, columnIds]);
 
-  // Table instance
   const table = useReactTable({
-    data,
-    columns: enhancedColumns,
-    state: { sorting, globalFilter, columnFilters },
-    onSortingChange: setSorting,
-    onGlobalFilterChange: setGlobalFilter,
-    onColumnFiltersChange: setColumnFilters,
+    data: filteredData,
+    columns,
+    state: {
+      sorting,
+      rowSelection,
+      pagination: {
+        pageIndex: Math.max(0, pageQuery - 1),
+        pageSize: rowsPerPage,
+      },
+      columnVisibility,
+    },
+    onSortingChange: (updater) => {
+      const next = typeof updater === "function" ? updater(sorting) : updater;
+      const first = next[0];
+      if (!first?.id) return;
+      void setSortQuery(`${first.id}:${first.desc ? "desc" : "asc"}`);
+      void setPageQuery(1);
+    },
+    onRowSelectionChange: setRowSelection,
+    onPaginationChange: (updater) => {
+      const current = {
+        pageIndex: Math.max(0, pageQuery - 1),
+        pageSize: rowsPerPage,
+      };
+      const next = typeof updater === "function" ? updater(current) : updater;
+      void setPageQuery(next.pageIndex + 1);
+    },
+    enableRowSelection: true,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
   });
 
   const rows = table.getRowModel().rows;
-  const pageCount = Math.max(1, Math.ceil(rows.length / rowsPerPage));
-  const paginatedRows = useMemo(() => {
-    const start = (page - 1) * rowsPerPage;
-    return rows.slice(start, start + rowsPerPage);
-  }, [page, rows, rowsPerPage]);
-  const fillerRowCount = Math.max(0, rowsPerPage - paginatedRows.length);
-  const tableColCount = columns.length + (hasActions ? 1 : 0) + 2;
+  const pageCount = Math.max(1, table.getPageCount());
+  const page = table.getState().pagination.pageIndex + 1;
+  const selectedRows = table.getFilteredSelectedRowModel().rows;
 
   useEffect(() => {
     if (page > pageCount) {
-      setPage(pageCount);
+      void setPageQuery(pageCount);
     }
-  }, [page, pageCount]);
+  }, [page, pageCount, setPageQuery]);
 
-  useEffect(() => {
-    setPage(1);
-  }, [globalFilter, columnFilters, data.length]);
+  const onSortColumn = (id: string) => {
+    if (sortId !== id) {
+      void setSortQuery(`${id}:asc`);
+      void setPageQuery(1);
+      return;
+    }
+    if (sortDir === "asc") {
+      void setSortQuery(`${id}:desc`);
+      void setPageQuery(1);
+      return;
+    }
+    void setSortQuery(defaultSort);
+    void setPageQuery(1);
+  };
+
+  const sortIcon = (id: string) => {
+    if (sortId !== id) return null;
+    return sortDir === "asc" ? (
+      <IconChevronUp size={14} />
+    ) : (
+      <IconChevronDown size={14} />
+    );
+  };
+
+  const toggleColumn = (id: string, checked: boolean) => {
+    const next = new Set(visibleIds);
+    if (checked) next.add(id);
+    else if (next.size > 1) next.delete(id);
+
+    const arr = columnIds.filter((colId) => next.has(colId));
+    if (arr.length === columnIds.length) {
+      void setVisibilityQuery("");
+      return;
+    }
+    void setVisibilityQuery(JSON.stringify(arr));
+  };
+
+  const applyDraftFilter = () => {
+    if (!draftFilterColumn || !draftFilterValue.trim()) return;
+    const next = {
+      ...activeTextFilters,
+      [draftFilterColumn]: draftFilterValue.trim(),
+    };
+    void setFiltersQuery(JSON.stringify(next));
+    void setPageQuery(1);
+    setDraftFilterValue("");
+  };
+
+  const setExplicitFilterValue = (id: string, value: string) => {
+    const next = { ...activeTextFilters };
+    if (!value.trim()) {
+      delete next[id];
+    } else {
+      next[id] = value.trim();
+    }
+    if (Object.keys(next).length === 0) {
+      void setFiltersQuery("");
+    } else {
+      void setFiltersQuery(JSON.stringify(next));
+    }
+    void setPageQuery(1);
+  };
+
+  const getColumnDistinctOptions = (id: string) => {
+    const options = Array.from(
+      new Set(
+        data
+          .map((row) => row[id])
+          .filter((value) => value !== null && value !== undefined)
+          .map((value) => String(value).trim())
+          .filter((value) => value.length > 0),
+      ),
+    ).sort((a, b) => a.localeCompare(b));
+    return options.slice(0, 50);
+  };
+
+  const removeFilter = (id: string) => {
+    const next = { ...activeTextFilters };
+    delete next[id];
+    if (Object.keys(next).length === 0) {
+      void setFiltersQuery("");
+    } else {
+      void setFiltersQuery(JSON.stringify(next));
+    }
+    void setPageQuery(1);
+  };
+
+  const clearFilters = () => {
+    void setFiltersQuery("");
+    void setPageQuery(1);
+  };
+
+  const onDeleteSelected = async () => {
+    if (!onDelete || selectedRows.length === 0 || isBulkDeleting) return;
+    try {
+      setActionError(null);
+      setIsBulkDeleting(true);
+      for (const row of selectedRows) {
+        await onDelete(row.original);
+      }
+      setRowSelection({});
+    } catch (error) {
+      setActionError(getErrorMessage(error));
+    } finally {
+      setIsBulkDeleting(false);
+    }
+  };
+
+  const pageNumbers = () => {
+    if (pageCount <= 7)
+      return Array.from({ length: pageCount }, (_, i) => i + 1);
+    if (page <= 4) return [1, 2, 3, 4, 5, -1, pageCount];
+    if (page >= pageCount - 3)
+      return [
+        1,
+        -1,
+        pageCount - 4,
+        pageCount - 3,
+        pageCount - 2,
+        pageCount - 1,
+        pageCount,
+      ];
+    return [1, -1, page - 1, page, page + 1, -1, pageCount];
+  };
+
+  const tableColCount =
+    table.getVisibleLeafColumns().length + (hasActions ? 1 : 0) + 1;
 
   return (
-    <div className="flex flex-col gap-3 w-[95.5%] ml-5.5">
-      {/* Top Bar */}
-      <div className="flex items-center justify-between gap-4">
+    <div className="ml-5.5 flex w-[95.5%] flex-col gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <Input
-          placeholder="Search"
-          value={globalFilter}
-          onChange={(e) => setGlobalFilter(e.target.value)}
-          className="w-full"
+          placeholder="Search records..."
+          value={searchQuery}
+          onChange={(e) => {
+            void setSearchQuery(e.target.value);
+            void setPageQuery(1);
+          }}
+          className="h-9 w-full max-w-xs"
         />
-        <div className="flex gap-3">
-          {onAdd && (
-            <div className="mt-2">
-              <AddButton<T>
-                fields={fields}
-                onSubmit={onAdd}
-                open={quickCreateOpen} // ✅ add this
-                onOpenChange={onQuickCreateOpenChange} // ✅ add this
-              >
-                Add {title}
-              </AddButton>
-            </div>
-          )}
 
-          {columnFilters.length === 0 ? (
-            <div className="mt-2">
-              <FilterButton
-                filterableColumns={filterableColumns}
-                title={title}
-                onApply={(filtersObj) => {
-                  const nextFilters = Object.entries(
-                    filtersObj as Record<string, FilterValue>,
-                  ).reduce<ColumnFiltersState>((acc, [id, value]) => {
-                    if (typeof value === "string") {
-                      const normalized = value.trim();
-                      if (normalized) {
-                        acc.push({ id, value: normalized });
-                      }
-                      return acc;
-                    }
-
-                    const from = value?.from?.trim();
-                    const to = value?.to?.trim();
-                    if (from || to) {
-                      acc.push({ id, value: { from, to } });
-                    }
-
-                    return acc;
-                  }, []);
-
-                  setColumnFilters(nextFilters);
-                }}
-                onClear={() => setColumnFilters([])}
-              >
-                Filter
-              </FilterButton>
-            </div>
-          ) : (
-            <div className="mt-2">
-              <Button
-                variant="outline"
-                className="gap-1.5 text-sm text-destructive border-destructive/30 hover:bg-destructive/10"
-                type="button"
-                onClick={() => setColumnFilters([])}
-              >
-                <IconX size={18} /> Clear
+        <div className="flex flex-wrap items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" type="button">
+                <IconAdjustmentsHorizontal size={16} />
+                Filters
               </Button>
-            </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-80 p-3">
+              <DropdownMenuLabel className="p-0">
+                Column Filter
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <div className="mt-2 grid grid-cols-12 gap-2">
+                <div className="col-span-5">
+                  <Select
+                    value={draftFilterColumn}
+                    onValueChange={setDraftFilterColumn}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Column" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filterModalColumns.map((col) => (
+                        <SelectItem key={col.id} value={col.id}>
+                          {col.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="col-span-5">
+                  {draftColumnMeta?.type === "date" ? (
+                    <Input
+                      type="date"
+                      value={draftFilterValue}
+                      onChange={(e) => setDraftFilterValue(e.target.value)}
+                    />
+                  ) : (
+                    <Select
+                      value={draftFilterValue || "__none__"}
+                      onValueChange={(value) =>
+                        setDraftFilterValue(value === "__none__" ? "" : value)
+                      }
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Option" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="__none__">Select option</SelectItem>
+                        {(draftFilterColumn
+                          ? getColumnDistinctOptions(draftFilterColumn)
+                          : []
+                        ).map((opt) => (
+                          <SelectItem key={opt} value={opt}>
+                            {opt}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+                <div className="col-span-2">
+                  <Button
+                    size="sm"
+                    type="button"
+                    onClick={applyDraftFilter}
+                    className="w-full"
+                  >
+                    Add
+                  </Button>
+                </div>
+              </div>
+
+              <DropdownMenuSeparator className="my-3" />
+              <DropdownMenuLabel className="p-0">
+                All Column Filters
+              </DropdownMenuLabel>
+              <div className="mt-2 grid max-h-72 grid-cols-1 gap-2 overflow-auto pr-1">
+                {filterModalColumns.map((col) => {
+                  const value = activeTextFilters[col.id] ?? "";
+                  const options = getColumnDistinctOptions(col.id);
+                  return (
+                    <div key={col.id} className="flex flex-col gap-1">
+                      <label className="text-muted-foreground text-xs font-medium">
+                        {col.label}
+                      </label>
+                      {col.type === "date" ? (
+                        <Input
+                          type="date"
+                          value={value}
+                          onChange={(e) =>
+                            setExplicitFilterValue(col.id, e.target.value)
+                          }
+                        />
+                      ) : (
+                        <Select
+                          value={value || "__all__"}
+                          onValueChange={(next) =>
+                            setExplicitFilterValue(
+                              col.id,
+                              next === "__all__" ? "" : next,
+                            )
+                          }
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder={`Filter ${col.label}`} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="__all__">All</SelectItem>
+                            {options.map((opt) => (
+                              <SelectItem key={opt} value={opt}>
+                                {opt}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {Object.keys(activeTextFilters).length > 0 && (
+                <div className="mt-3 space-y-1">
+                  {Object.entries(activeTextFilters).map(([id, value]) => (
+                    <div
+                      key={id}
+                      className="flex items-center justify-between rounded border px-2 py-1 text-xs"
+                    >
+                      <span>
+                        <strong>
+                          {columnMeta.find((c) => c.id === id)?.label || id}:
+                        </strong>{" "}
+                        {value}
+                      </span>
+                      <button type="button" onClick={() => removeFilter(id)}>
+                        <IconX size={12} />
+                      </button>
+                    </div>
+                  ))}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    type="button"
+                    onClick={clearFilters}
+                  >
+                    Clear all
+                  </Button>
+                </div>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <IconArrowsSort size={16} /> Sort
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64 p-3">
+              <DropdownMenuLabel className="p-0">Sort</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                <Select
+                  value={sortId}
+                  onValueChange={(id) => {
+                    void setSortQuery(
+                      `${id}:${sortDir === "desc" ? "desc" : "asc"}`,
+                    );
+                    void setPageQuery(1);
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Column" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {columnMeta.map((col) => (
+                      <SelectItem key={col.id} value={col.id}>
+                        {col.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select
+                  value={sortDir === "desc" ? "desc" : "asc"}
+                  onValueChange={(dir) => {
+                    void setSortQuery(`${sortId || dateAccessor}:${dir}`);
+                    void setPageQuery(1);
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Order" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="asc">Ascending</SelectItem>
+                    <SelectItem value="desc">Descending</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {onAdd && (
+            <AddButton<T>
+              fields={fields}
+              onSubmit={async (values) => {
+                try {
+                  setActionError(null);
+                  await onAdd(values);
+                } catch (error) {
+                  setActionError(getErrorMessage(error));
+                  throw error;
+                }
+              }}
+              open={quickCreateOpen}
+              onOpenChange={onQuickCreateOpenChange}
+            >
+              Add {title}
+            </AddButton>
           )}
-          <div className="mt-2">
-            <ExportButton entity={entity} />
-          </div>
+
+          {toolbarBeforeExport}
+
+          <ExportButton entity={entity} />
         </div>
       </div>
 
-      {/* Edit Modal */}
+      {actionError && <p className="text-sm text-destructive">{actionError}</p>}
+
+      {selectedRows.length > 0 && (
+        <div className="flex items-center justify-between rounded-md border bg-muted/25 px-3 py-2">
+          <div className="text-sm">
+            <strong>{selectedRows.length}</strong> selected
+          </div>
+          <div className="flex items-center gap-2">
+            {onDelete && (
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                disabled={isBulkDeleting}
+                onClick={onDeleteSelected}
+              >
+                <IconTrash size={14} />
+                {isBulkDeleting ? "Deleting..." : "Delete selected"}
+              </Button>
+            )}
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => table.toggleAllRowsSelected(false)}
+            >
+              Clear
+            </Button>
+          </div>
+        </div>
+      )}
+
       {onEdit && editRow && (
         <SidePeak<T>
-          key={(editRow as any)?.id || "new"}
+          key={(editRow as { id?: string })?.id || "new"}
           open={!!editRow}
-          onOpenChange={(o) => !o && setEditRow(null)}
+          onOpenChange={(open) => !open && setEditRow(null)}
           mode="update"
           fields={fields}
           initialValues={editRow}
           immutable={immutableFields}
           onSubmit={async (values) => {
-            await onEdit(editRow, values);
-            setEditRow(null);
+            try {
+              setActionError(null);
+              await onEdit(editRow, values);
+              setEditRow(null);
+            } catch (error) {
+              setActionError(getErrorMessage(error));
+              throw error;
+            }
           }}
           closeOnSuccess
         />
       )}
 
-      {/* Table */}
-      <div className={cn("rounded-md border-2 w-full")}>
+      <div className="w-full overflow-hidden rounded-md border-2">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                <TableHead aria-hidden className="w-[3%] p-0" />
-                {headerGroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    className="cursor-pointer select-none"
-                    onClick={header.column.getToggleSortingHandler()}
-                  >
-                    {header.isPlaceholder ? null : (
-                      <div className="flex w-full items-center justify-start gap-1 pl-2 text-left">
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                        {header.column.getIsSorted() === "asc"
-                          ? " 🔼"
-                          : header.column.getIsSorted() === "desc"
-                            ? " 🔽"
-                            : null}
-                      </div>
-                    )}
-                  </TableHead>
-                ))}
-                {(onEdit || onDelete) && (
-                  <TableHead>
-                    <div className="w-full pl-2 text-left">Actions</div>
-                  </TableHead>
+                <TableHead className="w-10 text-left">
+                  <input
+                    type="checkbox"
+                    aria-label="Select all rows"
+                    checked={table.getIsAllPageRowsSelected()}
+                    ref={(el) => {
+                      if (el)
+                        el.indeterminate = table.getIsSomePageRowsSelected();
+                    }}
+                    onChange={(e) =>
+                      table.toggleAllPageRowsSelected(e.target.checked)
+                    }
+                    className="size-4 accent-primary"
+                  />
+                </TableHead>
+
+                {headerGroup.headers.map((header) => {
+                  const accessor = (
+                    header.column.columnDef as { accessorKey?: unknown }
+                  ).accessorKey;
+                  const id =
+                    typeof accessor === "string"
+                      ? accessor
+                      : typeof header.column.id === "string"
+                        ? header.column.id
+                        : null;
+                  const canSort = Boolean(id && columnIds.includes(id));
+
+                  return (
+                    <TableHead
+                      key={header.id}
+                      className={cn(
+                        "px-8.5",
+                        canSort && "cursor-pointer select-none",
+                        id && columnTypeById.get(id) === "text"
+                          ? "text-left"
+                          : "text-center",
+                      )}
+                      onClick={() => {
+                        if (canSort && id) onSortColumn(id);
+                      }}
+                    >
+                      {header.isPlaceholder ? null : (
+                        <div
+                          className={cn(
+                            "flex w-full items-center gap-1",
+                            id && columnTypeById.get(id) === "text"
+                              ? "justify-start pl-5"
+                              : "justify-center",
+                          )}
+                        >
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                          {canSort && id ? sortIcon(id) : null}
+                        </div>
+                      )}
+                    </TableHead>
+                  );
+                })}
+
+                {hasActions && (
+                  <TableHead className="px-4 text-center">Actions</TableHead>
                 )}
-                <TableHead aria-hidden className="w-[3%] p-0" />
               </TableRow>
             ))}
           </TableHeader>
 
           <TableBody>
-            <AnimatePresence mode="wait">
-              {loading ? (
-                <motion.tr>
-                  <TableCell
-                    colSpan={tableColCount}
-                    className="h-24 text-center"
-                  >
-                    <span className="inline-block animate-spin text-primary text-3xl">
-                      ⏳
-                    </span>
-                    <span className="block mt-2 text-muted-foreground font-mono">
-                      Loading...
-                    </span>
-                  </TableCell>
-                </motion.tr>
-              ) : paginatedRows.length ? (
-                <>
-                  {paginatedRows.map((row, idx) => (
-                    <motion.tr
-                      key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.4 }}
-                      className={cn(
-                        idx % 2 === 0
-                          ? "bg-background"
-                          : "bg-muted/35 hover:bg-muted/50",
-                      )}
-                    >
-                      <TableCell aria-hidden className="w-[3%] p-0" />
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          <div className="w-full pl-2 text-left">
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext(),
-                            )}
-                          </div>
-                        </TableCell>
-                      ))}
-                      {(onEdit || onDelete) && (
-                        <TableCell>
-                          <div className="w-full pl-2 text-left">
-                            {onEdit && (
-                              <button
-                                onClick={() => setEditRow(row.original)}
-                                className="mr-2 text-primary hover:underline"
-                              >
-                                Edit
-                              </button>
-                            )}
-                            {onDelete && (
-                              <button
-                                onClick={() => onDelete(row.original)}
-                                className="text-destructive hover:underline"
-                              >
-                                Delete
-                              </button>
-                            )}
-                          </div>
-                        </TableCell>
-                      )}
-                      <TableCell aria-hidden className="w-[3%] p-0" />
-                    </motion.tr>
-                  ))}
-                  {Array.from({ length: fillerRowCount }, (_, idx) => (
-                    <TableRow
-                      key={`filler-row-${idx}`}
-                      className={cn(
-                        (paginatedRows.length + idx) % 2 === 0
-                          ? "bg-background"
-                          : "bg-muted/35 hover:bg-muted/50 ",
-                        "border-none",
-                      )}
-                    >
-                      {Array.from({
-                        length: tableColCount,
-                      }).map((_, cellIdx) => (
-                        <TableCell key={`filler-cell-${idx}-${cellIdx}`}>
-                          &nbsp;
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))}
-                </>
-              ) : (
-                <>
-                  <motion.tr
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="bg-background"
-                  >
-                    <TableCell
-                      colSpan={tableColCount}
-                      className="h-24 text-center text-muted-foreground"
-                    >
-                      <div className="flex flex-col items-center gap-1">
-                        <span className="text-2xl">🔍</span>
-                        <span className="font-mono text-sm">
-                          No results found.
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          Try adjusting your search or add a new{" "}
-                          {title?.toLowerCase?.() || "record"}.
-                        </span>
-                        {onAdd && (
-                          <div className="mt-2">
-                            <AddButton<T> fields={fields} onSubmit={onAdd}>
-                              Add {title}
-                            </AddButton>
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                  </motion.tr>
-                  {Array.from(
-                    { length: Math.max(0, rowsPerPage - 1) },
-                    (_, idx) => (
-                      <TableRow
-                        key={`empty-filler-row-${idx}`}
-                        className={cn(
-                          (idx + 1) % 2 === 0
-                            ? "bg-background"
-                            : "bg-muted/35 hover:bg-muted/50",
-                        )}
-                      >
-                        {Array.from({
-                          length: tableColCount,
-                        }).map((_, cellIdx) => (
-                          <TableCell
-                            key={`empty-filler-cell-${idx}-${cellIdx}`}
-                          >
-                            &nbsp;
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ),
+            {loading ? (
+              <TableRow>
+                <TableCell
+                  colSpan={tableColCount}
+                  className="h-24 text-center text-muted-foreground"
+                >
+                  Loading...
+                </TableCell>
+              </TableRow>
+            ) : rows.length > 0 ? (
+              rows.map((row, index) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() ? "selected" : undefined}
+                  className={cn(
+                    index % 2 === 0
+                      ? "bg-background"
+                      : "bg-muted/35 hover:bg-muted/50",
                   )}
-                </>
-              )}
-            </AnimatePresence>
+                >
+                  <TableCell className="w-10 text-center">
+                    <input
+                      type="checkbox"
+                      aria-label="Select row"
+                      checked={row.getIsSelected()}
+                      onChange={(e) => row.toggleSelected(e.target.checked)}
+                      className="size-4 accent-primary"
+                    />
+                  </TableCell>
+
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell
+                      key={cell.id}
+                      className={cn(
+                        "px-4",
+                        columnTypeById.get(cell.column.id) === "text"
+                          ? "text-left"
+                          : "text-center",
+                      )}
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </TableCell>
+                  ))}
+
+                  {hasActions && (
+                    <TableCell className="px-4 text-center">
+                      {onEdit && (
+                        <button
+                          type="button"
+                          onClick={() => setEditRow(row.original)}
+                          className="mr-3 text-primary hover:underline"
+                        >
+                          Edit
+                        </button>
+                      )}
+                      {onDelete && (
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            try {
+                              setActionError(null);
+                              await onDelete(row.original);
+                            } catch (error) {
+                              setActionError(getErrorMessage(error));
+                            }
+                          }}
+                          className="text-destructive hover:underline"
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </TableCell>
+                  )}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={tableColCount}
+                  className="h-24 text-center text-muted-foreground"
+                >
+                  No results found.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
 
-      {/* Pagination */}
-      <Pagination>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious
-              className="cursor-pointer"
-              onClick={(e) => {
-                e.preventDefault();
-                setPage((p) => Math.max(1, p - 1));
-              }}
-            />
-          </PaginationItem>
-          {Array.from({ length: pageCount }, (_, i) => i).map((i) => (
-            <PaginationItem key={i}>
-              <PaginationLink
-                isActive={i + 1 === page}
+      <div className="flex items-center justify-between gap-3">
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                className="cursor-pointer"
                 onClick={(e) => {
                   e.preventDefault();
-                  setPage(i + 1);
+                  table.previousPage();
                 }}
-                className={cn(
-                  "cursor-pointer hover:bg-accent hover:text-accent-foreground",
-                  page === i + 1 ? "bg-primary text-primary-foreground" : "",
-                )}
-              >
-                {i + 1}
-              </PaginationLink>
+              />
             </PaginationItem>
-          ))}
-          <PaginationItem>
-            <PaginationNext
-              className="cursor-pointer"
-              onClick={(e) => {
-                e.preventDefault();
-                setPage((p) => Math.min(pageCount, p + 1));
-              }}
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+
+            {pageNumbers().map((num, idx) =>
+              num === -1 ? (
+                <PaginationItem key={`ellipsis-${idx}`}>
+                  <PaginationEllipsis />
+                </PaginationItem>
+              ) : (
+                <PaginationItem key={num}>
+                  <PaginationLink
+                    isActive={num === page}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      table.setPageIndex(num - 1);
+                    }}
+                    className={cn(
+                      "cursor-pointer hover:bg-accent hover:text-accent-foreground",
+                      num === page ? "bg-primary text-primary-foreground" : "",
+                    )}
+                  >
+                    {num}
+                  </PaginationLink>
+                </PaginationItem>
+              ),
+            )}
+
+            <PaginationItem>
+              <PaginationNext
+                className="cursor-pointer"
+                onClick={(e) => {
+                  e.preventDefault();
+                  table.nextPage();
+                }}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      </div>
     </div>
   );
 }

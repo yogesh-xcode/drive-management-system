@@ -12,7 +12,9 @@ export interface BaseProps {
 // 2. Data Models (add more like Staff, Candidate as needed)
 
 export interface Client {
-  id: string;
+  id: number;
+  id_uuid?: string;
+  user_id?: string;
   programNo: number;
   date: string | Date;
   client: string;

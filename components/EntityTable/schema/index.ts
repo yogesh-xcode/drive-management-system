@@ -48,8 +48,17 @@ const candidateFields: FieldDef[] = [
   {
     name: "status",
     label: "Status",
+    type: "select",
+    options: [
+      { label: "Applied", value: "Applied" },
+      { label: "Screening", value: "Screening" },
+      { label: "Interview", value: "Interview" },
+      { label: "Offered", value: "Offered" },
+      { label: "Hired", value: "Hired" },
+      { label: "Rejected", value: "Rejected" },
+    ],
     required: true,
-    placeholder: "Interviewed",
+    placeholder: "Select status",
   },
   {
     name: "appliedDate",
