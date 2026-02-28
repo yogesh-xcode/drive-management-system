@@ -5,7 +5,6 @@ import {
   IconBriefcase,
   IconChartBar,
   IconDashboard,
-  IconInnerShadowTop,
   IconListDetails,
   IconReportAnalytics,
   IconUsersGroup,
@@ -23,6 +22,7 @@ import {
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { BrandLogo } from "@/components/BrandLogo";
 // Dashboard, Staff, Client, Students, Drive, Reports
 const data = {
   navMain: [
@@ -74,10 +74,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   className="data-[slot=sidebar-menu-button]:!p-1.5"
                 >
                   <Link href="/">
-                    <IconInnerShadowTop className="!size-5" />
-                    <span className="text-base font-semibold">
-                      Drivems Suite
-                    </span>
+                    <BrandLogo compact />
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

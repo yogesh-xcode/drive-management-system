@@ -1,11 +1,11 @@
 import {
-  Activity,
   Check,
   Database,
   ShieldCheck,
   Users,
 } from "lucide-react";
 import { LoginForm } from "@/components/login-form";
+import { BrandLogo } from "@/components/BrandLogo";
 
 export default function HomePage() {
   return (
@@ -14,19 +14,7 @@ export default function HomePage() {
         <section className="grid w-full overflow-hidden rounded-3xl border border-border bg-background text-foreground shadow-sm lg:grid-cols-2">
         <div className="hidden bg-muted/40 px-8 py-8 text-foreground lg:flex lg:flex-col lg:justify-between">
           <div>
-            <div className="inline-flex items-center gap-2.5">
-              <div className="flex size-8 items-center justify-center rounded-full border border-border bg-background text-primary">
-                <Activity className="size-4" />
-              </div>
-              <div>
-                <p className="text-sm font-extrabold tracking-[0.1em] text-foreground">
-                  DRIVEMS SUITE
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Recruitment Operations
-                </p>
-              </div>
-            </div>
+            <BrandLogo />
 
             <div className="mt-8 max-w-[420px] space-y-3">
               <h1 className="text-3xl font-extrabold leading-[1.08]">
@@ -73,19 +61,7 @@ export default function HomePage() {
         <div className="flex items-center justify-center p-4 lg:p-6">
           <div className="w-full max-w-[520px] rounded-2xl border border-border bg-card p-3 sm:p-5 lg:p-6">
             <div className="rounded-xl border border-border bg-muted/40 p-3">
-              <div className="inline-flex items-center gap-2.5">
-                <div className="flex size-8 items-center justify-center rounded-full border border-border bg-background text-primary">
-                  <Activity className="size-3.5" />
-                </div>
-                <div>
-                  <p className="text-[11px] font-extrabold tracking-[0.08em] text-foreground sm:text-xs">
-                    DRIVEMS SUITE
-                  </p>
-                  <p className="text-[10px] text-muted-foreground">
-                    Recruitment Management System
-                  </p>
-                </div>
-              </div>
+              <BrandLogo className="[&_p:first-child]:text-[11px] sm:[&_p:first-child]:text-xs [&_p:first-child]:tracking-[0.08em] [&_p:last-child]:text-[10px]" />
             </div>
 
             <LoginForm className="mt-3.5" />
