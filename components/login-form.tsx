@@ -3,13 +3,7 @@
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { IconBrandGoogleFilled, IconBrandWindows } from "@tabler/icons-react";
-import {
-  ArrowRight,
-  Eye,
-  EyeOff,
-  Lock,
-  Mail,
-} from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Lock, Mail } from "lucide-react";
 
 import Auth from "@/lib/auth/auth";
 import { supabase } from "@/lib/subabase";
@@ -41,41 +35,44 @@ export function LoginForm({
   const [dialogMessage, setDialogMessage] = useState<string | null>(null);
   const router = useRouter();
 
-  const handleAuth = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const handleAuth = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      setLoading(true);
 
-    if (mode === "signup") {
-      const { error } = await Auth.signUp({
-        display_name: name,
+      if (mode === "signup") {
+        const { error } = await Auth.signUp({
+          display_name: name,
+          email,
+          password,
+        });
+
+        setDialogMessage(
+          error
+            ? error.message
+            : "Account created. Check your email for a confirmation link.",
+        );
+        setDialogOpen(true);
+        setLoading(false);
+        return;
+      }
+
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      setDialogMessage(
-        error
-          ? error.message
-          : "Account created. Check your email for a confirmation link."
-      );
-      setDialogOpen(true);
+      if (error) {
+        setDialogMessage(error.message);
+        setDialogOpen(true);
+      } else {
+        router.push("/dashboard");
+      }
+
       setLoading(false);
-      return;
-    }
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      setDialogMessage(error.message);
-      setDialogOpen(true);
-    } else {
-      router.push("/dashboard");
-    }
-
-    setLoading(false);
-  }, [email, name, password, mode, router]);
+    },
+    [email, name, password, mode, router],
+  );
 
   const handleOAuthLogin = useCallback(async (provider: "google" | "azure") => {
     setLoading(true);
@@ -87,21 +84,24 @@ export function LoginForm({
     setLoading(false);
   }, []);
 
-  const handleForgotPasswordSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleForgotPasswordSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
 
-    if (!email) {
-      setDialogMessage("Please enter your email to reset your password.");
+      if (!email) {
+        setDialogMessage("Please enter your email to reset your password.");
+        setDialogOpen(true);
+        return;
+      }
+
+      setLoading(true);
+      await Auth.handleForgotPassword(email);
+      setDialogMessage("Check your email for a password reset link.");
       setDialogOpen(true);
-      return;
-    }
-
-    setLoading(true);
-    await Auth.handleForgotPassword(email);
-    setDialogMessage("Check your email for a password reset link.");
-    setDialogOpen(true);
-    setLoading(false);
-  }, [email]);
+      setLoading(false);
+    },
+    [email],
+  );
 
   return (
     <div className={cn("w-full", className)} {...props}>
@@ -127,7 +127,10 @@ export function LoginForm({
           </p>
 
           <div className="space-y-1.5 pt-0.5">
-            <Label htmlFor="email" className="text-[11px] font-bold text-foreground">
+            <Label
+              htmlFor="email"
+              className="text-[11px] font-bold text-foreground"
+            >
               Email Address
             </Label>
             <div className="flex items-center gap-2.5 rounded-lg border border-border bg-muted/45 px-2.5 py-1.5">
@@ -139,13 +142,16 @@ export function LoginForm({
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="h-auto border-0 bg-transparent p-0 text-xs text-foreground shadow-none focus-visible:ring-0"
+                className="h-auto border-0 bg-transparent pl-1 text-xs text-foreground shadow-none focus-visible:ring-0"
               />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="password" className="text-[11px] font-bold text-foreground">
+            <Label
+              htmlFor="password"
+              className="text-[11px] font-bold text-foreground"
+            >
               Password
             </Label>
             <div className="flex items-center gap-2.5 rounded-lg border border-border bg-muted/45 px-2.5 py-1.5">
@@ -157,7 +163,7 @@ export function LoginForm({
                 value={password}
                 placeholder="Enter your secure password"
                 onChange={(e) => setPassword(e.target.value)}
-                className="h-auto border-0 bg-transparent p-0 text-xs text-foreground shadow-none focus-visible:ring-0"
+                className="h-auto border-0 bg-transparent pl-1 text-xs text-foreground shadow-none focus-visible:ring-0"
               />
               <button
                 type="button"
