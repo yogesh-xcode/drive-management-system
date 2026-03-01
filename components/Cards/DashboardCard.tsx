@@ -1,5 +1,5 @@
 "use client";
-import { IconArrowRight, IconTrendingUp } from "@tabler/icons-react";
+import { IconArrowRight, IconTrendingUp } from "@/lib/icons";
 import {
   Card,
   CardDescription,

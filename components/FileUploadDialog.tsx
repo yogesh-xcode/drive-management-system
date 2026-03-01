@@ -1,6 +1,6 @@
 "use client";
 
-import { Upload } from "lucide-react";
+import { IconUpload } from "@/lib/icons";
 import Papa from "papaparse";
 import { useState } from "react";
 
@@ -165,7 +165,7 @@ export function FileUploadDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button type="button" variant="outline" size="sm">
-          <Upload className="h-4 w-4" />
+          <IconUpload className="h-4 w-4" />
           Upload {entityLabel}
         </Button>
       </DialogTrigger>
