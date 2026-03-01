@@ -6,7 +6,6 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { Toaster } from "sonner";
-import "@/styles/globals.css";
 
 const notoSerif = Noto_Serif({
   subsets: ["latin"],
