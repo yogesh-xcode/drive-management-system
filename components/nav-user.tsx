@@ -5,7 +5,7 @@ import {
   IconLogout,
   IconNotification,
   IconUserCircle,
-} from "@tabler/icons-react";
+} from "@/lib/icons";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -20,6 +20,9 @@ import {
 import { userService } from "@/lib/repositories";
 import { useEffect, useState } from "react";
 
+const makeAvatarUrl = (name: string) =>
+  `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=E5E7EB&color=111827`;
+
 export function NavUser() {
   interface userType {
     name: string;
@@ -28,9 +31,9 @@ export function NavUser() {
   }
 
   const [user, setUser] = useState<userType>({
-    name: "",
+    name: "Admin",
     email: "admin@gmail.com",
-    avatar: "/next.svg",
+    avatar: makeAvatarUrl("Admin"),
   });
 
   useEffect(() => {
@@ -41,7 +44,9 @@ export function NavUser() {
       setUser({
         name: supabaseUser?.user_metadata?.display_name || "Admin",
         email: supabaseUser?.email,
-        avatar: supabaseUser?.user_metadata?.avatar_url || "/vercel.svg",
+        avatar:
+          supabaseUser?.user_metadata?.avatar_url ||
+          makeAvatarUrl(supabaseUser?.user_metadata?.display_name || "Admin"),
       });
     };
     fetchUser();
@@ -52,18 +57,12 @@ export function NavUser() {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="hover:bg-accent flex items-center space-x-2 rounded-md px-2 py-1.5"
+          className="hover:bg-accent flex items-center rounded-md p-1"
         >
-          <Avatar className="h-8 w-8  grayscale ">
-            <AvatarImage src={user.avatar || "/vercel.svg"} alt={user.name} />
+          <Avatar className="h-8 w-8 grayscale">
+            <AvatarImage src={user.avatar || makeAvatarUrl(user.name)} alt={user.name} />
             <AvatarFallback className="rounded-full">HH</AvatarFallback>
           </Avatar>
-          <div className="hidden flex-col gap-0.5 text-left text-sm leading-tight sm:flex">
-            <span className="truncate font-medium">{user.name}</span>
-            <span className="text-muted-foreground truncate text-xs">
-              {user.email}
-            </span>
-          </div>
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
@@ -75,7 +74,7 @@ export function NavUser() {
         <DropdownMenuLabel className="p-0 font-normal">
           <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
             <Avatar className="h-8 w-8 rounded-lg">
-              <AvatarImage src={user.avatar} alt={user.name} />
+              <AvatarImage src={user.avatar || makeAvatarUrl(user.name)} alt={user.name} />
               <AvatarFallback className="rounded-lg">HH</AvatarFallback>
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight">

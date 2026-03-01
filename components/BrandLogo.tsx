@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Activity } from "lucide-react";
+import { IconActivity } from "@/lib/icons";
 
 type BrandLogoProps = {
   compact?: boolean;
@@ -10,7 +10,7 @@ export function BrandLogo({ compact = false, className }: BrandLogoProps) {
   return (
     <div className={cn("inline-flex items-center gap-2.5", className)}>
       <div className="flex size-8 items-center justify-center rounded-full border border-border bg-background text-primary">
-        <Activity className="size-4" />
+        <IconActivity className="size-4" />
       </div>
       {compact ? (
         <span className="text-base font-semibold group-data-[collapsible=icon]:hidden">
