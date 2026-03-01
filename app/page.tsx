@@ -1,9 +1,9 @@
 import {
-  Check,
-  Database,
-  ShieldCheck,
-  Users,
-} from "lucide-react";
+  IconCheck,
+  IconDatabase,
+  IconShieldCheck,
+  IconUsers,
+} from "@/lib/icons";
 import { LoginForm } from "@/components/login-form";
 import { BrandLogo } from "@/components/BrandLogo";
 
@@ -32,15 +32,15 @@ export default function HomePage() {
               </p>
               <div className="flex flex-wrap gap-2">
                 <FeatureBadge
-                  icon={<ShieldCheck className="size-3.5" />}
+                  icon={<IconShieldCheck className="size-3.5" />}
                   label="Role-based Access"
                 />
                 <FeatureBadge
-                  icon={<Database className="size-3.5" />}
+                  icon={<IconDatabase className="size-3.5" />}
                   label="Pipeline Tracking"
                 />
                 <FeatureBadge
-                  icon={<Users className="size-3.5" />}
+                  icon={<IconUsers className="size-3.5" />}
                   label="Team Collaboration"
                 />
               </div>
@@ -49,7 +49,7 @@ export default function HomePage() {
 
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1 text-[11px] font-semibold text-foreground">
-              <Check className="size-3.5" />
+              <IconCheck className="size-3.5" />
               Trusted for multi-team hiring operations
             </div>
             <p className="text-[11px] text-muted-foreground">

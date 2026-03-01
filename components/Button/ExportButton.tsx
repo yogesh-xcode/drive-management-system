@@ -1,7 +1,7 @@
 import { serviceMap } from "@/lib/repositories/services";
 import Papa from "papaparse";
 import { saveAs } from "file-saver";
-import { IconTableExport } from "@tabler/icons-react";
+import { IconTableExport } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { JSX } from "react";
 import { ExportButtonProps } from "@/types";

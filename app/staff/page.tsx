@@ -11,15 +11,17 @@ import DepartmentStatCard from "@/components/Cards/Staff/DepartmentStatCard";
 import TenureStatCard from "@/components/Cards/Staff/StaffTenureCard";
 import StaffCountCard from "@/components/Cards/Staff/StaffCountCard";
 import PageSkeleton from "@/components/Skeleton/PageSkeleton";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { PageSection } from "@/components/layout/PageHeader";
 import { FileUploadDialog } from "@/components/FileUploadDialog";
 
 export default function Page() {
   const [staffData, setStaffData] = useState<Staff[]>([]);
   const [loading, setLoading] = useState(true);
+  const [openQuickCreate, setOpenQuickCreate] = useState(false);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
   const normalizeValue = (value: unknown) =>
     String(value ?? "").trim().toLowerCase();
 
@@ -74,6 +76,19 @@ export default function Page() {
     };
   }, [router]);
 
+  useEffect(() => {
+    if (searchParams.get("add") === "1") {
+      setOpenQuickCreate(true);
+    }
+  }, [searchParams]);
+
+  const handleQuickCreateOpenChange = (open: boolean) => {
+    setOpenQuickCreate(open);
+    if (!open && searchParams.get("add") === "1") {
+      router.replace("/staff");
+    }
+  };
+
   if (loading) {
     return <PageSkeleton />;
   }
@@ -96,6 +111,8 @@ export default function Page() {
             onAdd={async (values) => {
               await staffDataService.create(values);
               await fetchData();
+              setOpenQuickCreate(false);
+              router.replace("/staff");
             }}
             onEdit={async (row, values) => {
               await staffDataService.update(row.id, values);
@@ -110,6 +127,8 @@ export default function Page() {
             rowsPerPage={8}
             loading={loading}
             immutableFields={["id"]}
+            quickCreateOpen={openQuickCreate}
+            onQuickCreateOpenChange={handleQuickCreateOpenChange}
             toolbarBeforeExport={
               <FileUploadDialog
                 entityLabel="Staff"

@@ -8,7 +8,7 @@ import React from "react";
 import CardCover from "@/components/Cards/CardCover";
 import DashboardCard from "@/components/Cards/DashboardCard";
 import { DriveStatsCard } from "@/components/Cards/Drive/StatCard";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { PageSection } from "@/components/layout/PageHeader";
 import { FileUploadDialog } from "@/components/FileUploadDialog";
 import PageSkeleton from "@/components/Skeleton/PageSkeleton";
@@ -17,8 +17,10 @@ export default function Page() {
   const [authenticated, setAuthenticated] = React.useState(false);
   const [driveData, setDriveData] = React.useState<Drive[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [openQuickCreate, setOpenQuickCreate] = React.useState(false);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
   const normalizeValue = (value: unknown) =>
     String(value ?? "").trim().toLowerCase();
 
@@ -69,6 +71,19 @@ export default function Page() {
     };
   }, [router]);
 
+  React.useEffect(() => {
+    if (searchParams.get("add") === "1") {
+      setOpenQuickCreate(true);
+    }
+  }, [searchParams]);
+
+  const handleQuickCreateOpenChange = (open: boolean) => {
+    setOpenQuickCreate(open);
+    if (!open && searchParams.get("add") === "1") {
+      router.replace("/drive");
+    }
+  };
+
   if (loading || !authenticated) {
     return <PageSkeleton />;
   }
@@ -99,6 +114,8 @@ export default function Page() {
             onAdd={async (values) => {
               await driveDataService.create(values);
               await fetchData();
+              setOpenQuickCreate(false);
+              router.replace("/drive");
             }}
             onEdit={async (row, values) => {
               await driveDataService.update(row.id, values);
@@ -113,6 +130,8 @@ export default function Page() {
             rowsPerPage={8}
             loading={loading}
             immutableFields={["id"]}
+            quickCreateOpen={openQuickCreate}
+            onQuickCreateOpenChange={handleQuickCreateOpenChange}
             toolbarBeforeExport={
               <FileUploadDialog
                 entityLabel="Drive"
