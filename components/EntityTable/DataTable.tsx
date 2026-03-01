@@ -31,7 +31,7 @@ import { SidePeak } from "@/components/SidePeak";
 import { cn } from "@/lib/utils";
 import { serviceMap } from "@/lib/repositories/services";
 import { Button } from "@/components/ui/button";
-import { IconX } from "@tabler/icons-react";
+import { IconX } from "@/lib/icons";
 import dayjs from "dayjs";
 
 export interface DataTableProps<T extends Record<string, any>> {
@@ -322,7 +322,7 @@ export function DataTable<T extends Record<string, any>>({
                       </motion.span>
                     </span>
                     <span className="block mt-2 text-muted-foreground font-mono">
-                      Loading...
+                      {""}
                     </span>
                   </TableCell>
                 </motion.tr>
