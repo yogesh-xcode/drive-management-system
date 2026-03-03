@@ -173,12 +173,24 @@ export function DataTable<T extends Record<string, any>>({
     <div className="space-y-4 flex flex-col w-[95.7%]">
       {/* Top Bar */}
       <div className="flex">
-        <Input
-          placeholder="Search"
-          value={globalFilter}
-          onChange={(e) => setGlobalFilter(e.target.value)}
-          className="w-full mr-8"
-        />
+        <div className="relative mr-8 w-full">
+          <Input
+            placeholder="Search"
+            value={globalFilter}
+            onChange={(e) => setGlobalFilter(e.target.value)}
+            className="w-full border-border/80 bg-muted/25 pr-9 hover:border-border"
+          />
+          {globalFilter.length > 0 && (
+            <button
+              type="button"
+              aria-label="Clear table search"
+              onClick={() => setGlobalFilter("")}
+              className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2 -translate-y-1/2 rounded-sm p-0.5 transition-colors"
+            >
+              <IconX size={16} />
+            </button>
+          )}
+        </div>
         <div className="flex gap-4">
           {onAdd && (
             <AddButton<T>
