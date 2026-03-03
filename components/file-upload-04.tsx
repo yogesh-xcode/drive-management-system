@@ -1,12 +1,13 @@
 "use client";
 
-import { File as FileIcon, FileSpreadsheet, X } from "lucide-react";
+import { IconFile, IconFileSpreadsheet, IconX } from "@/lib/icons";
 import { ChangeEvent, DragEvent, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils";
 
 type UploadSummary = {
   inserted: number;
@@ -34,6 +35,7 @@ export default function FileUpload04({
     uploading: false,
   });
   const [inlineError, setInlineError] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const validFileTypes = [
@@ -81,11 +83,17 @@ export default function FileUpload04({
 
   const handleDrop = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
+    setIsDragging(false);
     handleFile(event.dataTransfer.files?.[0]);
   };
 
   const resetFile = () => {
-    setUploadState({ file: null, progress: 0, preparing: false, uploading: false });
+    setUploadState({
+      file: null,
+      progress: 0,
+      preparing: false,
+      uploading: false,
+    });
     setInlineError(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -93,13 +101,13 @@ export default function FileUpload04({
   };
 
   const getFileIcon = () => {
-    if (!uploadState.file) return <FileIcon />;
+    if (!uploadState.file) return <IconFile />;
 
     const fileExt = uploadState.file.name.split(".").pop()?.toLowerCase() || "";
     return ["csv", "xlsx", "xls"].includes(fileExt) ? (
-      <FileSpreadsheet className="h-5 w-5 text-foreground" />
+      <IconFileSpreadsheet className="h-5 w-5 text-foreground" />
     ) : (
-      <FileIcon className="h-5 w-5 text-foreground" />
+      <IconFile className="h-5 w-5 text-foreground" />
     );
   };
 
@@ -125,10 +133,13 @@ export default function FileUpload04({
 
       const skipped = result.skipped ?? 0;
       if (result.inserted === 0 && skipped > 0) {
-        toast.warning(`No new rows imported. Skipped ${skipped} duplicate row(s).`, {
-          position: "bottom-right",
-          duration: 3500,
-        });
+        toast.warning(
+          `No new rows imported. Skipped ${skipped} duplicate row(s).`,
+          {
+            position: "bottom-right",
+            duration: 3500,
+          },
+        );
       } else if (skipped > 0) {
         toast.success(
           `Imported ${result.inserted} row(s). Skipped ${skipped} row(s).`,
@@ -148,7 +159,9 @@ export default function FileUpload04({
       resetFile();
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "Upload failed. Please try again.";
+        error instanceof Error
+          ? error.message
+          : "Upload failed. Please try again.";
       setUploadState((prev) => ({ ...prev, uploading: false }));
 
       const normalized = message.toLowerCase();
@@ -160,10 +173,13 @@ export default function FileUpload04({
         setInlineError(
           "Duplicate file data detected. Some records already exist in Supabase.",
         );
-        toast.error("Duplicate records detected. Some rows were already present.", {
-          position: "bottom-right",
-          duration: 3500,
-        });
+        toast.error(
+          "Duplicate records detected. Some rows were already present.",
+          {
+            position: "bottom-right",
+            duration: 3500,
+          },
+        );
         return;
       }
 
@@ -176,7 +192,7 @@ export default function FileUpload04({
   };
 
   return (
-    <div className="flex items-center justify-center p-10 w-full max-w-lg">
+    <div className="flex items-center justify-center px-10 py-4 w-full max-w-lg">
       <form
         className="w-full"
         onSubmit={(e) => {
@@ -189,12 +205,25 @@ export default function FileUpload04({
         </h3>
 
         <div
-          className="flex justify-center rounded-md border mt-2 border-dashed border-input px-6 py-12"
+          className={cn(
+            "mt-2 flex justify-center rounded-md border-2 border-dashed px-6 py-12 transition-colors",
+            isDragging
+              ? "border-primary bg-primary/5"
+              : "border-border bg-muted/20",
+          )}
+          onDragEnter={(e) => {
+            e.preventDefault();
+            setIsDragging(true);
+          }}
+          onDragLeave={(e) => {
+            e.preventDefault();
+            setIsDragging(false);
+          }}
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
         >
           <div>
-            <FileIcon
+            <IconFile
               className="mx-auto h-12 w-12 text-muted-foreground"
               aria-hidden={true}
             />
@@ -235,7 +264,7 @@ export default function FileUpload04({
               aria-label="Remove"
               onClick={resetFile}
             >
-              <X className="h-5 w-5 shrink-0" aria-hidden={true} />
+              <IconX className="h-5 w-5 shrink-0" aria-hidden={true} />
             </Button>
 
             <div className="flex items-center space-x-2.5">
@@ -282,7 +311,9 @@ export default function FileUpload04({
           </Button>
         </div>
         {inlineError && (
-          <p className="mt-2 text-right text-sm text-destructive">{inlineError}</p>
+          <p className="mt-2 text-right text-sm text-destructive">
+            {inlineError}
+          </p>
         )}
       </form>
     </div>

@@ -70,7 +70,7 @@ export const candidateColumns: ColumnDef<Candidate>[] = [
   },
   {
     accessorKey: "position",
-    header: () => <div className="-ml-4.5">Position</div>,
+    header: "Position",
   },
   {
     accessorKey: "status",

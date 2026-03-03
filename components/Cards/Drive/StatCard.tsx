@@ -15,7 +15,7 @@ import {
   IconTrendingUp,
   IconTrendingDown,
   IconCalendarTime,
-} from "@tabler/icons-react";
+} from "@/lib/icons";
 import { Drive } from "@/types";
 
 type DriveStatsCardProps = {

@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Candidate } from "@/types";
-import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react";
+import { IconTrendingDown, IconTrendingUp } from "@/lib/icons";
 import dayjs from "dayjs";
 
 function applicationsForMonth(data: Candidate[], month: dayjs.Dayjs) {

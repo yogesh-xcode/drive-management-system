@@ -1,10 +1,11 @@
-// components/SkeletonCard.js
+import { Skeleton } from "@/components/ui/skeleton";
+
 export function DashboardSkeleten() {
   return (
-    <div className="animate-pulse bg-card rounded-lg h-[180px] flex flex-col justify-between p-4 shadow-xs">
-      <div className="h-6 bg-primary/10 rounded w-1/2 mb-2"></div>
-      <div className="h-6 bg-primary/10 rounded w-full mb-2"></div>
-      <div className="h-6 bg-primary/10 rounded w-2/3"></div>
+    <div className="bg-card flex h-[180px] flex-col justify-between rounded-lg border border-border p-4 shadow-xs">
+      <Skeleton className="mb-2 h-6 w-1/2" />
+      <Skeleton className="mb-2 h-6 w-full" />
+      <Skeleton className="h-6 w-2/3" />
     </div>
   );
 }

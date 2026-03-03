@@ -17,11 +17,11 @@ export const driveColumns = [
   },
   {
     accessorKey: "title",
-    header: () => <div className="-ml-4 ">Drive Title</div>,
+    header: "Drive Title",
   },
   {
     accessorKey: "location",
-    header: () => <div className="-ml-8">Location</div>,
+    header: () => "Location",
   },
   {
     accessorKey: "status",

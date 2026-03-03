@@ -9,7 +9,7 @@ import CardCover from "@/components/Cards/CardCover";
 import DashboardCard from "@/components/Cards/DashboardCard";
 import { GrowthStatsCard } from "@/components/Cards/Client/GrowthStatsCard";
 import { OpeningsStatsCard } from "@/components/Cards/Client/OpeningsStatsCard";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import PageSkeleton from "@/components/Skeleton/PageSkeleton";
 import { PageSection } from "@/components/layout/PageHeader";
 import { FileUploadDialog } from "@/components/FileUploadDialog";
@@ -18,8 +18,10 @@ export default function Page() {
   const [authenticated, setAuthenticated] = useState(false);
   const [clientData, setClientData] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
+  const [openQuickCreate, setOpenQuickCreate] = useState(false);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
   const normalizeValue = (value: unknown) =>
     String(value ?? "").trim().toLowerCase();
 
@@ -73,6 +75,19 @@ export default function Page() {
     };
   }, [router]);
 
+  useEffect(() => {
+    if (searchParams.get("add") === "1") {
+      setOpenQuickCreate(true);
+    }
+  }, [searchParams]);
+
+  const handleQuickCreateOpenChange = (open: boolean) => {
+    setOpenQuickCreate(open);
+    if (!open && searchParams.get("add") === "1") {
+      router.replace("/client");
+    }
+  };
+
   if (loading || !authenticated) {
     return <PageSkeleton />;
   }
@@ -110,6 +125,8 @@ export default function Page() {
             onAdd={async (values) => {
               await clientDataService.create(values);
               await fetchData();
+              setOpenQuickCreate(false);
+              router.replace("/client");
             }}
             onEdit={async (row, values) => {
               await clientDataService.update(row.programNo, values);
@@ -124,6 +141,8 @@ export default function Page() {
             rowsPerPage={8}
             loading={loading}
             immutableFields={["programNo"]}
+            quickCreateOpen={openQuickCreate}
+            onQuickCreateOpenChange={handleQuickCreateOpenChange}
             toolbarBeforeExport={
               <FileUploadDialog
                 entityLabel="Client"

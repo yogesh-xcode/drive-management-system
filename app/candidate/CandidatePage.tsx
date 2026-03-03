@@ -83,6 +83,13 @@ export default function Page() {
     }
   }, [searchParams]);
 
+  const handleQuickCreateOpenChange = (open: boolean) => {
+    setOpenQuickCreate(open);
+    if (!open && searchParams.get("add") === "1") {
+      router.replace("/candidate");
+    }
+  };
+
   if (loading || !authenticated) {
     return <PageSkeleton />;
   }
@@ -159,7 +166,7 @@ export default function Page() {
             }
             // 🔹 Controlled open state for Quick Create
             quickCreateOpen={openQuickCreate}
-            onQuickCreateOpenChange={setOpenQuickCreate}
+            onQuickCreateOpenChange={handleQuickCreateOpenChange}
           />
         </PageSection>
       </div>

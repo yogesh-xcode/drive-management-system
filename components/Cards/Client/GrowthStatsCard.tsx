@@ -9,7 +9,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { IconTrendingUp, IconTrendingDown } from "@tabler/icons-react";
+import { IconTrendingUp, IconTrendingDown } from "@/lib/icons";
 
 // dataType = your clientDataType
 type GrowthStatsCardProps<T> = {
