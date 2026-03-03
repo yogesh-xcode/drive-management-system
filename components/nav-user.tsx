@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  IconCreditCard,
   IconLogout,
   IconNotification,
   IconUserCircle,
@@ -19,6 +18,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { userService } from "@/lib/repositories";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Auth from "@/lib/auth/auth";
 
 const makeAvatarUrl = (name: string) =>
   `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=E5E7EB&color=111827`;
@@ -35,6 +36,7 @@ export function NavUser() {
     email: "admin@gmail.com",
     avatar: makeAvatarUrl("Admin"),
   });
+  const router = useRouter();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -52,12 +54,18 @@ export function NavUser() {
     fetchUser();
   }, []);
 
+  const handleLogout = async () => {
+    await Auth.signOut();
+    router.replace("/login");
+    router.refresh();
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="hover:bg-accent flex items-center rounded-md p-1"
+          className="flex items-center rounded-md p-1"
         >
           <Avatar className="h-8 w-8 grayscale">
             <AvatarImage src={user.avatar || makeAvatarUrl(user.name)} alt={user.name} />
@@ -87,21 +95,17 @@ export function NavUser() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => router.push("/account?tab=account")}>
             <IconUserCircle />
             Account
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <IconCreditCard />
-            Billing
-          </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => router.push("/notifications")}>
             <IconNotification />
             Notifications
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => void handleLogout()}>
           <IconLogout />
           Log out
         </DropdownMenuItem>

@@ -9,6 +9,8 @@ const TITLE_BY_ROUTE: Record<string, string> = {
   "/candidate": "Candidate",
   "/drive": "Drive",
   "/reports": "Reports",
+  "/account": "Account",
+  "/notifications": "Notifications",
 };
 
 export function PageTitle() {
