@@ -21,7 +21,7 @@ import {
   IconPrinter,
   IconTrash,
   IconX,
-} from "@tabler/icons-react";
+} from "@/lib/icons";
 import { useQueryState } from "nuqs";
 
 import { AddButton } from "@/components/Button/AddButton";
@@ -37,6 +37,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   Pagination,
   PaginationContent,
@@ -54,6 +55,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   Table,
   TableBody,
   TableCell,
@@ -61,6 +69,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getEntityFilterConfig } from "@/lib/filter-config";
 import { serviceMap } from "@/lib/repositories/services";
 import { cn } from "@/lib/utils";
 
@@ -87,6 +97,108 @@ type ColumnMeta = {
   label: string;
   type: "text" | "number" | "date" | "select";
 };
+
+type FilterOperator =
+  | "contains"
+  | "equals"
+  | "startsWith"
+  | "endsWith"
+  | "before"
+  | "after";
+
+type FilterCriterion = {
+  value: string;
+  operator: FilterOperator;
+};
+
+type FilterMap = Record<string, FilterCriterion>;
+type PrimaryFilter = {
+  columnId: string;
+  criterion: FilterCriterion;
+} | null;
+
+const TEXT_FILTER_OPERATORS: Array<{ label: string; value: FilterOperator }> = [
+  { label: "Contains", value: "contains" },
+  { label: "Equals", value: "equals" },
+  { label: "Starts with", value: "startsWith" },
+  { label: "Ends with", value: "endsWith" },
+];
+
+const DATE_FILTER_OPERATORS: Array<{ label: string; value: FilterOperator }> = [
+  { label: "On", value: "equals" },
+  { label: "Before", value: "before" },
+  { label: "After", value: "after" },
+];
+
+function normalizeFilterMap(filters: FilterMap): FilterMap {
+  const next: FilterMap = {};
+  for (const [id, criterion] of Object.entries(filters)) {
+    const value = criterion?.value?.trim?.() ?? "";
+    if (!value) continue;
+    next[id] = {
+      value,
+      operator: criterion?.operator ?? "contains",
+    };
+  }
+  return next;
+}
+
+function toComparableDate(value: string): number | null {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+  ).getTime();
+}
+
+function matchesFilter(cellRaw: unknown, criterion: FilterCriterion): boolean {
+  const cell = normalizeText(cellRaw);
+  const filterValue = criterion.value.toLowerCase();
+
+  switch (criterion.operator) {
+    case "equals":
+      return cell === filterValue;
+    case "startsWith":
+      return cell.startsWith(filterValue);
+    case "endsWith":
+      return cell.endsWith(filterValue);
+    case "before": {
+      const cellDate = toComparableDate(String(cellRaw ?? ""));
+      const filterDate = toComparableDate(criterion.value);
+      if (cellDate === null || filterDate === null) return false;
+      return cellDate < filterDate;
+    }
+    case "after": {
+      const cellDate = toComparableDate(String(cellRaw ?? ""));
+      const filterDate = toComparableDate(criterion.value);
+      if (cellDate === null || filterDate === null) return false;
+      return cellDate > filterDate;
+    }
+    case "contains":
+    default:
+      return cell.includes(filterValue);
+  }
+}
+
+function filterOperatorLabel(operator: FilterOperator): string {
+  switch (operator) {
+    case "equals":
+      return "is";
+    case "startsWith":
+      return "starts with";
+    case "endsWith":
+      return "ends with";
+    case "before":
+      return "before";
+    case "after":
+      return "after";
+    case "contains":
+    default:
+      return "contains";
+  }
+}
 
 function safeJsonParse<T>(value: string): T | null {
   try {
@@ -125,6 +237,41 @@ function formatPrintValue(type: ColumnMeta["type"], value: unknown): string {
     }
   }
   return String(value);
+}
+
+function isInteractiveTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  return Boolean(
+    target.closest(
+      "button,a,input,select,textarea,[role='button'],[role='menuitem'],[data-no-row-open='true']",
+    ),
+  );
+}
+
+function toDisplayText(value: unknown): string {
+  if (value === null || value === undefined) return "";
+  return String(value).trim();
+}
+
+function getInitials(value: string): string {
+  return value
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+}
+
+function firstNonEmptyValue(
+  row: Record<string, unknown>,
+  keys: string[],
+): string {
+  for (const key of keys) {
+    const value = toDisplayText(row[key]);
+    if (value) return value;
+  }
+  return "";
 }
 
 function buildColumnMeta<T extends Record<string, any>>(
@@ -189,20 +336,19 @@ export function PaginatedDataTable<T extends Record<string, any>>({
     [columns, fields, data],
   );
 
-  const filterModalColumns = useMemo(
-    () =>
-      columnMeta.filter(
-        (col) =>
-          col.id !== "id" &&
-          col.id !== "name" &&
-          col.id !== "fullName" &&
-          col.id !== "email" &&
-          col.id !== "contact" &&
-          col.id !== "programNo" &&
-          col.id !== "opening",
-      ),
-    [columnMeta],
-  );
+  const entityFilterConfig = useMemo(() => getEntityFilterConfig(entity), [entity]);
+  const primaryFilterColumns = useMemo(() => {
+    const configured = entityFilterConfig.primary.columns;
+    if (!configured.length) return columnMeta;
+    const allowed = new Set(configured);
+    return columnMeta.filter((col) => allowed.has(col.id));
+  }, [columnMeta, entityFilterConfig]);
+  const advancedFilterColumns = useMemo(() => {
+    const configured = entityFilterConfig.advanced.columns;
+    if (!configured || configured.length === 0) return columnMeta;
+    const allowed = new Set(configured);
+    return columnMeta.filter((col) => allowed.has(col.id));
+  }, [columnMeta, entityFilterConfig]);
 
   const columnIds = useMemo(() => columnMeta.map((c) => c.id), [columnMeta]);
   const columnTypeById = useMemo(
@@ -273,34 +419,149 @@ export function PaginatedDataTable<T extends Record<string, any>>({
       history: "replace",
     },
   );
+  const [primaryFilterQuery, setPrimaryFilterQuery] = useQueryState<string>(
+    `${entity}PrimaryFilter`,
+    {
+      parse: (v) => v,
+      serialize: (v) => v,
+      defaultValue: "",
+      clearOnDefault: true,
+      shallow: true,
+      history: "replace",
+    },
+  );
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [editRow, setEditRow] = useState<T | null>(null);
+  const [viewRow, setViewRow] = useState<T | null>(null);
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
 
   const [draftFilterColumn, setDraftFilterColumn] = useState<string>("");
+  const [draftFilterOperator, setDraftFilterOperator] =
+    useState<FilterOperator>("contains");
   const [draftFilterValue, setDraftFilterValue] = useState<string>("");
   const draftColumnMeta = useMemo(
     () =>
-      filterModalColumns.find((col) => col.id === draftFilterColumn) ?? null,
-    [filterModalColumns, draftFilterColumn],
+      advancedFilterColumns.find((col) => col.id === draftFilterColumn) ?? null,
+    [advancedFilterColumns, draftFilterColumn],
   );
 
-  const activeTextFilters = useMemo(() => {
-    if (!filtersQuery) return {} as Record<string, string>;
-    const parsed = safeJsonParse<Record<string, string>>(filtersQuery);
-    if (!parsed || typeof parsed !== "object")
-      return {} as Record<string, string>;
+  useEffect(() => {
+    if (!draftFilterColumn) return;
+    if (draftColumnMeta?.type === "date") {
+      if (!["equals", "before", "after"].includes(draftFilterOperator)) {
+        setDraftFilterOperator("equals");
+      }
+      return;
+    }
+    if (["before", "after"].includes(draftFilterOperator)) {
+      setDraftFilterOperator("contains");
+    }
+  }, [draftFilterColumn, draftColumnMeta, draftFilterOperator]);
 
-    const normalized: Record<string, string> = {};
-    for (const [id, value] of Object.entries(parsed)) {
-      if (columnIds.includes(id) && value.trim()) {
-        normalized[id] = value.trim();
+  useEffect(() => {
+    if (!draftFilterColumn) return;
+    if (advancedFilterColumns.some((col) => col.id === draftFilterColumn)) return;
+    setDraftFilterColumn("");
+    setDraftFilterValue("");
+  }, [draftFilterColumn, advancedFilterColumns]);
+
+  const activeFilters = useMemo(() => {
+    if (!filtersQuery) return {} as FilterMap;
+    const parsed = safeJsonParse<Record<string, unknown>>(filtersQuery);
+    if (!parsed || typeof parsed !== "object") return {} as FilterMap;
+
+    const next: FilterMap = {};
+    for (const [id, raw] of Object.entries(parsed)) {
+      if (!columnIds.includes(id)) continue;
+
+      if (typeof raw === "string") {
+        const value = raw.trim();
+        if (!value) continue;
+        next[id] = { value, operator: "contains" };
+        continue;
+      }
+
+      if (raw && typeof raw === "object") {
+        const value = String((raw as { value?: unknown }).value ?? "").trim();
+        const operator = (raw as { operator?: FilterOperator }).operator;
+        if (!value) continue;
+        next[id] = {
+          value,
+          operator: operator ?? "contains",
+        };
       }
     }
-    return normalized;
+    return normalizeFilterMap(next);
   }, [filtersQuery, columnIds]);
+  const activePrimaryFilter = useMemo(() => {
+    if (!primaryFilterQuery) return null;
+    const parsed = safeJsonParse<{
+      columnId?: unknown;
+      criterion?: { value?: unknown; operator?: FilterOperator };
+    }>(primaryFilterQuery);
+    if (!parsed) return null;
+    const columnId = String(parsed.columnId ?? "");
+    if (!columnId || !columnIds.includes(columnId)) return null;
+
+    const value = String(parsed.criterion?.value ?? "").trim();
+    if (!value) return null;
+
+    return {
+      columnId,
+      criterion: {
+        value,
+        operator: parsed.criterion?.operator ?? "equals",
+      },
+    };
+  }, [primaryFilterQuery, columnIds]);
+  const [pendingFilters, setPendingFilters] = useState<FilterMap>({});
+  const [primaryDraftColumn, setPrimaryDraftColumn] = useState<string>("");
+  const [primaryDraftValue, setPrimaryDraftValue] = useState<string>("");
+  const pendingActiveFilters = useMemo(
+    () => normalizeFilterMap(pendingFilters),
+    [pendingFilters],
+  );
+  const primaryDraftColumnMeta = useMemo(
+    () =>
+      primaryFilterColumns.find((col) => col.id === primaryDraftColumn) ?? null,
+    [primaryFilterColumns, primaryDraftColumn],
+  );
+
+  useEffect(() => {
+    if (!primaryDraftColumn) return;
+    if (primaryFilterColumns.some((col) => col.id === primaryDraftColumn)) return;
+    setPrimaryDraftColumn("");
+    setPrimaryDraftValue("");
+  }, [primaryDraftColumn, primaryFilterColumns]);
+
+  const hasPendingFilterChanges = useMemo(() => {
+    const normalize = (obj: FilterMap) =>
+      JSON.stringify(
+        Object.entries(normalizeFilterMap(obj))
+          .map(([id, criterion]) => [id, criterion.value, criterion.operator])
+          .sort(([a], [b]) => a.localeCompare(b)),
+      );
+    const activePrimary = activePrimaryFilter
+      ? `${activePrimaryFilter.columnId}:${activePrimaryFilter.criterion.value}`
+      : "";
+    const draftPrimary = primaryDraftValue.trim()
+      ? `${primaryDraftColumn}:${primaryDraftValue.trim()}`
+      : "";
+
+    return (
+      normalize(pendingFilters) !== normalize(activeFilters) ||
+      activePrimary !== draftPrimary
+    );
+  }, [
+    pendingFilters,
+    activeFilters,
+    activePrimaryFilter,
+    primaryDraftColumn,
+    primaryDraftValue,
+  ]);
 
   const visibleIds = useMemo(() => {
     if (!visibilityQuery) return new Set(columnIds);
@@ -337,13 +598,21 @@ export function PaginatedDataTable<T extends Record<string, any>>({
         );
         if (!hit) return false;
       }
-      for (const [id, value] of Object.entries(activeTextFilters)) {
-        const cell = normalizeText(row[id]);
-        if (!cell.includes(value.toLowerCase())) return false;
+      if (
+        activePrimaryFilter &&
+        !matchesFilter(
+          row[activePrimaryFilter.columnId],
+          activePrimaryFilter.criterion,
+        )
+      ) {
+        return false;
+      }
+      for (const [id, criterion] of Object.entries(activeFilters)) {
+        if (!matchesFilter(row[id], criterion)) return false;
       }
       return true;
     });
-  }, [data, searchQuery, activeTextFilters, columnIds]);
+  }, [data, searchQuery, activeFilters, columnIds, activePrimaryFilter]);
 
   const table = useReactTable({
     data: filteredData,
@@ -381,6 +650,27 @@ export function PaginatedDataTable<T extends Record<string, any>>({
   });
 
   const rows = table.getRowModel().rows;
+  const paddedRows = useMemo(() => {
+    if (rows.length === 0) return [];
+
+    const entries = rows.map((row, index) => ({
+      row,
+      index,
+      placeholder: false,
+      key: row.id,
+    }));
+
+    for (let i = rows.length; i < rowsPerPage; i++) {
+      entries.push({
+        row: null,
+        index: i,
+        placeholder: true,
+        key: `placeholder-${i}`,
+      });
+    }
+
+    return entries;
+  }, [rows, rowsPerPage]);
   const pageCount = Math.max(1, table.getPageCount());
   const page = table.getState().pagination.pageIndex + 1;
   const selectedRows = table.getFilteredSelectedRowModel().rows;
@@ -430,28 +720,63 @@ export function PaginatedDataTable<T extends Record<string, any>>({
 
   const applyDraftFilter = () => {
     if (!draftFilterColumn || !draftFilterValue.trim()) return;
-    const next = {
-      ...activeTextFilters,
-      [draftFilterColumn]: draftFilterValue.trim(),
-    };
-    void setFiltersQuery(JSON.stringify(next));
-    void setPageQuery(1);
+    const operator: FilterOperator =
+      draftColumnMeta?.type === "date"
+        ? ["equals", "before", "after"].includes(draftFilterOperator)
+          ? draftFilterOperator
+          : "equals"
+        : ["before", "after"].includes(draftFilterOperator)
+          ? "contains"
+          : draftFilterOperator;
+
+    setPendingFilters((prev) => ({
+      ...prev,
+      [draftFilterColumn]: {
+        value: draftFilterValue.trim(),
+        operator,
+      },
+    }));
     setDraftFilterValue("");
   };
 
-  const setExplicitFilterValue = (id: string, value: string) => {
-    const next = { ...activeTextFilters };
-    if (!value.trim()) {
-      delete next[id];
-    } else {
-      next[id] = value.trim();
-    }
+  const applyPendingFilters = () => {
+    const next = normalizeFilterMap(pendingFilters);
     if (Object.keys(next).length === 0) {
       void setFiltersQuery("");
     } else {
       void setFiltersQuery(JSON.stringify(next));
     }
+
+    const primaryValue = primaryDraftValue.trim();
+    if (!primaryDraftColumn || !primaryValue) {
+      void setPrimaryFilterQuery("");
+    } else {
+      const nextPrimary: PrimaryFilter = {
+        columnId: primaryDraftColumn,
+        criterion: {
+          value: primaryValue,
+          operator: "equals",
+        },
+      };
+      void setPrimaryFilterQuery(JSON.stringify(nextPrimary));
+    }
+
     void setPageQuery(1);
+    setIsFilterMenuOpen(false);
+  };
+
+  const clearPendingFilters = () => {
+    setPendingFilters({});
+    setPrimaryDraftColumn("");
+    setPrimaryDraftValue("");
+  };
+
+  const removePendingFilter = (id: string) => {
+    setPendingFilters((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
   };
 
   const getColumnDistinctOptions = (id: string) => {
@@ -464,23 +789,16 @@ export function PaginatedDataTable<T extends Record<string, any>>({
           .filter((value) => value.length > 0),
       ),
     ).sort((a, b) => a.localeCompare(b));
-    return options.slice(0, 50);
-  };
-
-  const removeFilter = (id: string) => {
-    const next = { ...activeTextFilters };
-    delete next[id];
-    if (Object.keys(next).length === 0) {
-      void setFiltersQuery("");
-    } else {
-      void setFiltersQuery(JSON.stringify(next));
-    }
-    void setPageQuery(1);
+    return options.slice(0, 100);
   };
 
   const clearFilters = () => {
     void setFiltersQuery("");
+    void setPrimaryFilterQuery("");
     void setPageQuery(1);
+    setPendingFilters({});
+    setPrimaryDraftColumn("");
+    setPrimaryDraftValue("");
   };
 
   const onDeleteSelected = async () => {
@@ -518,17 +836,61 @@ export function PaginatedDataTable<T extends Record<string, any>>({
 
   const tableColCount =
     table.getVisibleLeafColumns().length + (hasActions ? 1 : 0) + 1;
+  const getCellTextAlignClass = (columnId: string, value: unknown) => {
+    if (
+      columnId === "department" &&
+      typeof value === "string" &&
+      value.trim().length > 0 &&
+      value.trim().length < 4
+    ) {
+      return "text-center";
+    }
+    return columnTypeById.get(columnId) === "text" ? "text-left" : "text-center";
+  };
 
   const printableColumns = useMemo(
     () => columnMeta.filter((col) => visibleIds.has(col.id)),
     [columnMeta, visibleIds],
   );
+  const viewRowRecord = viewRow as Record<string, unknown> | null;
+  const previewName = viewRowRecord
+    ? firstNonEmptyValue(viewRowRecord, ["fullName", "name"])
+    : "";
+  const previewSubtitle = viewRowRecord
+    ? firstNonEmptyValue(viewRowRecord, ["position", "department", "status"])
+    : "";
+  const previewAvatar = viewRowRecord
+    ? firstNonEmptyValue(viewRowRecord, [
+      "avatar",
+      "avatarUrl",
+      "image",
+      "photo",
+      "profileImage",
+      "profilePhoto",
+      "picture",
+    ])
+    : "";
+  const hasAvatarLayout = Boolean(previewName || previewAvatar);
 
   const handlePrint = () => {
     if (filteredData.length === 0) {
       setActionError("No rows available to print.");
       return;
     }
+
+    const rootStyles = getComputedStyle(document.documentElement);
+    const getCssVar = (name: string, fallback: string) => {
+      const value = rootStyles.getPropertyValue(name).trim();
+      return value || fallback;
+    };
+    const printTheme = {
+      foreground: getCssVar("--foreground", "#1f2937"),
+      background: getCssVar("--background", "#ffffff"),
+      mutedForeground: getCssVar("--muted-foreground", "#6b7280"),
+      border: getCssVar("--border", "#d1d5db"),
+      muted: getCssVar("--muted", "#f3f4f6"),
+      rowAlt: "color-mix(in oklch, var(--muted) 40%, var(--background) 60%)",
+    };
 
     const titleText = `${title} Report`;
     const printedAt = new Date().toLocaleString("en-GB");
@@ -559,8 +921,8 @@ export function PaginatedDataTable<T extends Record<string, any>>({
       body {
         margin: 0;
         font-family: "Segoe UI", Arial, sans-serif;
-        color: #1f2937;
-        background: #ffffff;
+        color: ${printTheme.foreground};
+        background: ${printTheme.background};
       }
       .watermark {
         position: fixed;
@@ -596,29 +958,29 @@ export function PaginatedDataTable<T extends Record<string, any>>({
         margin: 0;
       }
       .meta {
-        color: #6b7280;
+        color: ${printTheme.mutedForeground};
         font-size: 12px;
       }
       table {
         width: 100%;
         border-collapse: collapse;
-        border: 1px solid #d1d5db;
+        border: 1px solid ${printTheme.border};
         font-size: 12px;
       }
       thead th {
-        background: #f3f4f6;
+        background: ${printTheme.muted};
         text-align: left;
         font-weight: 700;
-        border: 1px solid #d1d5db;
+        border: 1px solid ${printTheme.border};
         padding: 8px;
       }
       tbody td {
-        border: 1px solid #e5e7eb;
+        border: 1px solid ${printTheme.border};
         padding: 7px 8px;
         vertical-align: top;
       }
       tbody tr:nth-child(even) td {
-        background: #fafafa;
+        background: ${printTheme.rowAlt};
       }
     </style>
   </head>
@@ -679,40 +1041,92 @@ export function PaginatedDataTable<T extends Record<string, any>>({
   return (
     <div className="ml-5.5 flex w-[95.5%] flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Input
-          placeholder="Search records..."
-          value={searchQuery}
-          onChange={(e) => {
-            void setSearchQuery(e.target.value);
-            void setPageQuery(1);
-          }}
-          className="h-9 w-full max-w-xs"
-        />
+        <div className="relative w-full max-w-xs">
+          <Input
+            placeholder="Search records..."
+            value={searchQuery}
+            onChange={(e) => {
+              void setSearchQuery(e.target.value);
+              void setPageQuery(1);
+            }}
+            className="h-9 w-full border-border/80 bg-muted/25 pr-9 hover:border-border"
+          />
+          {searchQuery.length > 0 && (
+            <button
+              type="button"
+              aria-label="Clear table search"
+              onClick={() => {
+                void setSearchQuery("");
+                void setPageQuery(1);
+              }}
+              className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2 -translate-y-1/2 rounded-sm p-0.5 transition-colors"
+            >
+              <IconX size={16} />
+            </button>
+          )}
+        </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <DropdownMenu>
+          {(Object.keys(activeFilters).length > 0 || activePrimaryFilter) && (
+            <Button
+              variant="destructive"
+              size="sm"
+              type="button"
+              onClick={clearFilters}
+            >
+              <IconX size={14} />
+              Clear
+            </Button>
+          )}
+
+          <DropdownMenu
+            open={isFilterMenuOpen}
+            onOpenChange={(open) => {
+              setIsFilterMenuOpen(open);
+              if (open) {
+                setPendingFilters(activeFilters);
+                setPrimaryDraftColumn(
+                  activePrimaryFilter?.columnId ??
+                  entityFilterConfig.primary.defaultColumn ??
+                  primaryFilterColumns[0]?.id ??
+                  "",
+                );
+                setPrimaryDraftValue(
+                  activePrimaryFilter?.criterion.value ?? "",
+                );
+              }
+            }}
+          >
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" type="button">
                 <IconAdjustmentsHorizontal size={16} />
                 Filters
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80 p-3">
+            <DropdownMenuContent
+              side="left"
+              align="start"
+              sideOffset={8}
+              className="w-80 p-3"
+            >
               <DropdownMenuLabel className="p-0">
-                Column Filter
+                Primary Filter
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <div className="mt-2 grid grid-cols-12 gap-2">
                 <div className="col-span-5">
                   <Select
-                    value={draftFilterColumn}
-                    onValueChange={setDraftFilterColumn}
+                    value={primaryDraftColumn}
+                    onValueChange={(value) => {
+                      setPrimaryDraftColumn(value);
+                      setPrimaryDraftValue("");
+                    }}
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Column" />
                     </SelectTrigger>
                     <SelectContent>
-                      {filterModalColumns.map((col) => (
+                      {primaryFilterColumns.map((col) => (
                         <SelectItem key={col.id} value={col.id}>
                           {col.label}
                         </SelectItem>
@@ -720,27 +1134,29 @@ export function PaginatedDataTable<T extends Record<string, any>>({
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="col-span-5">
-                  {draftColumnMeta?.type === "date" ? (
-                    <Input
-                      type="date"
-                      value={draftFilterValue}
-                      onChange={(e) => setDraftFilterValue(e.target.value)}
+                <div className="col-span-7">
+                  {primaryDraftColumnMeta?.type === "date" ? (
+                    <DatePicker
+                      value={primaryDraftValue}
+                      onChange={(value) => {
+                        setPrimaryDraftValue(value);
+                      }}
                     />
                   ) : (
                     <Select
-                      value={draftFilterValue || "__none__"}
-                      onValueChange={(value) =>
-                        setDraftFilterValue(value === "__none__" ? "" : value)
-                      }
+                      value={primaryDraftValue || "__none__"}
+                      onValueChange={(value) => {
+                        const nextValue = value === "__none__" ? "" : value;
+                        setPrimaryDraftValue(nextValue);
+                      }}
                     >
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Option" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="__none__">Select option</SelectItem>
-                        {(draftFilterColumn
-                          ? getColumnDistinctOptions(draftFilterColumn)
+                        {(primaryDraftColumn
+                          ? getColumnDistinctOptions(primaryDraftColumn)
                           : []
                         ).map((opt) => (
                           <SelectItem key={opt} value={opt}>
@@ -749,6 +1165,90 @@ export function PaginatedDataTable<T extends Record<string, any>>({
                         ))}
                       </SelectContent>
                     </Select>
+                  )}
+                </div>
+              </div>
+
+              {activePrimaryFilter && (
+                <div className="mt-3 rounded border px-2 py-1 text-xs">
+                  <div className="flex items-center justify-between">
+                    <span>
+                      <strong>Primary:</strong>{" "}
+                      {columnMeta.find(
+                        (c) => c.id === activePrimaryFilter.columnId,
+                      )?.label || activePrimaryFilter.columnId}{" "}
+                      is {activePrimaryFilter.criterion.value}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPrimaryDraftColumn("");
+                        setPrimaryDraftValue("");
+                      }}
+                    >
+                      <IconX size={12} />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <DropdownMenuSeparator className="my-3" />
+              <DropdownMenuLabel className="p-0">
+                Column Filters
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <div className="mt-2 grid grid-cols-12 gap-2">
+                <div className="col-span-4">
+                  <Select
+                    value={draftFilterColumn}
+                    onValueChange={setDraftFilterColumn}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Column" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {advancedFilterColumns.map((col) => (
+                        <SelectItem key={col.id} value={col.id}>
+                          {col.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="col-span-3">
+                  <Select
+                    value={draftFilterOperator}
+                    onValueChange={(value) =>
+                      setDraftFilterOperator(value as FilterOperator)
+                    }
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Rule" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(draftColumnMeta?.type === "date"
+                        ? DATE_FILTER_OPERATORS
+                        : TEXT_FILTER_OPERATORS
+                      ).map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="col-span-3">
+                  {draftColumnMeta?.type === "date" ? (
+                    <DatePicker
+                      value={draftFilterValue}
+                      onChange={setDraftFilterValue}
+                    />
+                  ) : (
+                    <Input
+                      value={draftFilterValue}
+                      onChange={(e) => setDraftFilterValue(e.target.value)}
+                      placeholder="Value"
+                    />
                   )}
                 </div>
                 <div className="col-span-2">
@@ -763,83 +1263,53 @@ export function PaginatedDataTable<T extends Record<string, any>>({
                 </div>
               </div>
 
-              <DropdownMenuSeparator className="my-3" />
-              <DropdownMenuLabel className="p-0">
-                All Column Filters
-              </DropdownMenuLabel>
-              <div className="mt-2 grid max-h-72 grid-cols-1 gap-2 overflow-auto pr-1">
-                {filterModalColumns.map((col) => {
-                  const value = activeTextFilters[col.id] ?? "";
-                  const options = getColumnDistinctOptions(col.id);
-                  return (
-                    <div key={col.id} className="flex flex-col gap-1">
-                      <label className="text-muted-foreground text-xs font-medium">
-                        {col.label}
-                      </label>
-                      {col.type === "date" ? (
-                        <Input
-                          type="date"
-                          value={value}
-                          onChange={(e) =>
-                            setExplicitFilterValue(col.id, e.target.value)
-                          }
-                        />
-                      ) : (
-                        <Select
-                          value={value || "__all__"}
-                          onValueChange={(next) =>
-                            setExplicitFilterValue(
-                              col.id,
-                              next === "__all__" ? "" : next,
-                            )
-                          }
+              {Object.keys(pendingActiveFilters).length > 0 && (
+                <div className="mt-3 space-y-1 border-t pt-3">
+                  {Object.entries(pendingActiveFilters).map(
+                    ([id, criterion]) => (
+                      <div
+                        key={id}
+                        className="flex items-center justify-between rounded border px-2 py-1 text-xs"
+                      >
+                        <span>
+                          <strong>
+                            {columnMeta.find((c) => c.id === id)?.label || id}:
+                          </strong>{" "}
+                          {filterOperatorLabel(criterion.operator)}{" "}
+                          {criterion.value}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => removePendingFilter(id)}
                         >
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder={`Filter ${col.label}`} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="__all__">All</SelectItem>
-                            {options.map((opt) => (
-                              <SelectItem key={opt} value={opt}>
-                                {opt}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-
-              {Object.keys(activeTextFilters).length > 0 && (
-                <div className="mt-3 space-y-1">
-                  {Object.entries(activeTextFilters).map(([id, value]) => (
-                    <div
-                      key={id}
-                      className="flex items-center justify-between rounded border px-2 py-1 text-xs"
-                    >
-                      <span>
-                        <strong>
-                          {columnMeta.find((c) => c.id === id)?.label || id}:
-                        </strong>{" "}
-                        {value}
-                      </span>
-                      <button type="button" onClick={() => removeFilter(id)}>
-                        <IconX size={12} />
-                      </button>
-                    </div>
-                  ))}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    type="button"
-                    onClick={clearFilters}
-                  >
-                    Clear all
-                  </Button>
+                          <IconX size={12} />
+                        </button>
+                      </div>
+                    ),
+                  )}
                 </div>
               )}
+
+              <div className="mt-3 flex items-center justify-center gap-24 ">
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="min-w-24"
+                  type="button"
+                  onClick={clearPendingFilters}
+                >
+                  Clear all
+                </Button>
+                <Button
+                  size="sm"
+                  className="min-w-24"
+                  type="button"
+                  onClick={applyPendingFilters}
+                  disabled={!hasPendingFilterChanges}
+                >
+                  Apply
+                </Button>
+              </div>
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -914,12 +1384,17 @@ export function PaginatedDataTable<T extends Record<string, any>>({
 
           {toolbarBeforeExport}
 
-          <Button variant="outline" size="sm" type="button" onClick={handlePrint}>
+          <ExportButton entity={entity} />
+
+          <Button
+            variant="outline"
+            size="sm"
+            type="button"
+            onClick={handlePrint}
+          >
             <IconPrinter size={16} />
             Print
           </Button>
-
-          <ExportButton entity={entity} />
         </div>
       </div>
 
@@ -976,6 +1451,80 @@ export function PaginatedDataTable<T extends Record<string, any>>({
           }}
           closeOnSuccess
         />
+      )}
+
+      {viewRow && (
+        <Dialog open={!!viewRow} onOpenChange={(open) => !open && setViewRow(null)}>
+          <DialogContent
+            className={cn(
+              "top-1/2 left-4/7  max-h-[calc(100%-4rem)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto sm:max-w-3xl",
+              hasAvatarLayout && "sm:max-w-4xl lg:max-w-5xl",
+            )}
+          >
+            <DialogHeader>
+              <DialogTitle>{title} Details</DialogTitle>
+              <DialogDescription>
+                Read-only view of the selected row.
+              </DialogDescription>
+            </DialogHeader>
+            {hasAvatarLayout ? (
+              <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_320px] lg:grid-cols-[minmax(0,1fr)_360px]">
+                <div className="grid grid-cols-1 gap-3">
+                  {printableColumns.map((column) => (
+                    <div
+                      key={`view-${column.id}`}
+                      className="rounded-md border bg-muted/20 px-3 py-2.5"
+                    >
+                      <p className="text-muted-foreground text-xs">{column.label}</p>
+                      <p className="mt-1 break-words text-sm font-medium">
+                        {formatPrintValue(
+                          column.type,
+                          (viewRowRecord || {})[column.id],
+                        )}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                <div className="rounded-md border bg-muted/15 p-5">
+                  <p className="text-muted-foreground text-sm">Preview</p>
+                  <div className="mt-4 flex flex-col items-center text-center">
+                    <Avatar className="size-24 border">
+                      {previewAvatar ? <AvatarImage src={previewAvatar} alt={previewName} /> : null}
+                      <AvatarFallback className="text-lg font-semibold">
+                        {getInitials(previewName || "User")}
+                      </AvatarFallback>
+                    </Avatar>
+                    <p className="mt-4 text-xl font-semibold">
+                      {previewName || "Record"}
+                    </p>
+                    {previewSubtitle ? (
+                      <p className="text-muted-foreground mt-1 text-sm">
+                        {previewSubtitle}
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                {printableColumns.map((column) => (
+                  <div
+                    key={`view-${column.id}`}
+                    className="rounded-md border bg-muted/20 px-3 py-2"
+                  >
+                    <p className="text-muted-foreground text-xs">{column.label}</p>
+                    <p className="mt-1 break-words text-sm font-medium">
+                      {formatPrintValue(
+                        column.type,
+                        (viewRowRecord || {})[column.id],
+                      )}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       )}
 
       <div className="w-full overflow-hidden rounded-md border-2">
@@ -1059,50 +1608,83 @@ export function PaginatedDataTable<T extends Record<string, any>>({
                   colSpan={tableColCount}
                   className="h-24 text-center text-muted-foreground"
                 >
-                  Loading...
+                  {""}
                 </TableCell>
               </TableRow>
             ) : rows.length > 0 ? (
-              rows.map((row, index) => (
+              paddedRows.map(({ row, index, placeholder, key }) => (
                 <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() ? "selected" : undefined}
+                  key={key}
+                  data-state={
+                    !placeholder && row && row.getIsSelected()
+                      ? "selected"
+                      : undefined
+                  }
                   className={cn(
-                    index % 2 === 0
-                      ? "bg-background"
-                      : "bg-muted/35 hover:bg-muted/50",
+                    index % 2 === 0 ? "bg-background" : "bg-muted/35",
+                    !placeholder && "cursor-pointer hover:bg-muted/50",
+                    placeholder && "pointer-events-none",
                   )}
+                  onClick={(event) => {
+                    if (placeholder || !row) return;
+                    if (isInteractiveTarget(event.target)) return;
+                    setViewRow(row.original);
+                  }}
                 >
                   <TableCell className="w-10 text-center">
-                    <input
-                      type="checkbox"
-                      aria-label="Select row"
-                      checked={row.getIsSelected()}
-                      onChange={(e) => row.toggleSelected(e.target.checked)}
-                      className="size-4 accent-primary"
-                    />
+                    {placeholder ? (
+                      <input
+                        type="checkbox"
+                        aria-label="Placeholder row"
+                        checked={false}
+                        disabled
+                        className="size-4 accent-primary invisible"
+                      />
+                    ) : (
+                      row && (
+                        <input
+                          type="checkbox"
+                          aria-label="Select row"
+                          checked={row.getIsSelected()}
+                          onChange={(e) => row.toggleSelected(e.target.checked)}
+                          className="size-4 accent-primary"
+                        />
+                      )
+                    )}
                   </TableCell>
 
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className={cn(
-                        "px-4",
-                        columnTypeById.get(cell.column.id) === "text"
-                          ? "text-left"
-                          : "text-center",
-                      )}
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
+                  {placeholder || !row
+                    ? table.getVisibleLeafColumns().map((column) => (
+                      <TableCell
+                        key={`placeholder-${column.id}-${index}`}
+                        className={cn(
+                          "px-4",
+                          columnTypeById.get(column.id) === "text"
+                            ? "text-left"
+                            : "text-center",
+                        )}
+                      >
+                        {" "}
+                      </TableCell>
+                    ))
+                    : row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        key={cell.id}
+                        className={cn(
+                          "px-4",
+                          getCellTextAlignClass(cell.column.id, cell.getValue()),
+                        )}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </TableCell>
+                    ))}
 
                   {hasActions && (
                     <TableCell className="px-4 text-center">
-                      {onEdit && (
+                      {!placeholder && row && onEdit && (
                         <button
                           type="button"
                           onClick={() => setEditRow(row.original)}
@@ -1111,7 +1693,7 @@ export function PaginatedDataTable<T extends Record<string, any>>({
                           Edit
                         </button>
                       )}
-                      {onDelete && (
+                      {!placeholder && row && onDelete && (
                         <button
                           type="button"
                           onClick={async () => {

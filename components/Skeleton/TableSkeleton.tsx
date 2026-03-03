@@ -1,27 +1,35 @@
-export default function TableSkeleton({ rows = 8, columns = 5 }) {
+import { Skeleton } from "@/components/ui/skeleton";
+
+export default function TableSkeleton({ rows = 8 }) {
   return (
-    <div className="w-full animate-pulse rounded-lg border bg-card">
-      <div className="grid grid-cols-5 gap-3 border-b px-4 py-3">
-        {[...Array(columns)].map((_, i) => (
-          <div key={i} className="h-4 w-20 rounded bg-primary/10 md:w-28" />
-        ))}
+    <div className="bg-card w-full rounded-2xl border border-border">
+      <div className="grid grid-cols-[36px_1fr_1fr_1fr_1fr_1fr] items-center gap-4 border-b border-border px-4 py-3">
+        <Skeleton className="h-5 w-5 rounded-sm" />
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-4 w-20" />
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-4 w-20" />
+        <Skeleton className="h-4 w-24" />
       </div>
       {[...Array(rows)].map((_, rowIdx) => (
         <div
           key={rowIdx}
-          className="grid grid-cols-5 gap-3 border-b px-4 py-3 last:border-b-0"
+          className="grid grid-cols-[36px_1fr_1fr_1fr_1fr_1fr] items-center gap-4 border-b border-border px-4 py-3 last:border-b-0"
         >
-          {[...Array(columns)].map((_, colIdx) => (
-            <div key={colIdx} className="h-4 w-20 rounded bg-primary/10 md:w-28" />
-          ))}
+          <Skeleton className="h-5 w-5 rounded-sm" />
+          <Skeleton className="h-5 w-28 rounded-full" />
+          <Skeleton className="h-5 w-32 rounded-full" />
+          <Skeleton className="h-5 w-28 rounded-full" />
+          <Skeleton className="h-5 w-24 rounded-full" />
+          <Skeleton className="h-5 w-24 rounded-full" />
         </div>
       ))}
-      <div className="flex items-center justify-end gap-2 border-t px-4 py-3">
-        <div className="h-8 w-20 rounded-md bg-primary/10" />
+      <div className="flex items-center justify-center gap-2 border-t border-border px-4 py-3">
+        <Skeleton className="h-9 w-24 rounded-md" />
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-8 w-8 rounded-md bg-primary/10" />
+          <Skeleton key={i} className="h-9 w-9 rounded-md" />
         ))}
-        <div className="h-8 w-20 rounded-md bg-primary/10" />
+        <Skeleton className="h-9 w-24 rounded-md" />
       </div>
     </div>
   );

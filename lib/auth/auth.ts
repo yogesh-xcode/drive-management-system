@@ -24,6 +24,20 @@ class Auth {
   handleForgotPassword = async (email: string) => {
     await supabase.auth.resetPasswordForEmail(email);
   };
+
+  async signOut() {
+    return await supabase.auth.signOut();
+  }
+
+  async updateProfile(displayName: string) {
+    return await supabase.auth.updateUser({
+      data: { display_name: displayName },
+    });
+  }
+
+  async updatePassword(password: string) {
+    return await supabase.auth.updateUser({ password });
+  }
 }
 
 export default new Auth();

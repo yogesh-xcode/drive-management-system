@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { IconFilter } from "@tabler/icons-react";
+import { IconFilter } from "@/lib/icons";
 import {
   Dialog,
   DialogContent,
@@ -8,6 +8,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import React, { useState } from "react";
 import { JSX } from "react";
 import {
@@ -95,42 +96,42 @@ export const FilterButton = React.forwardRef<
                 </label>
                 {col.type === "date" ? (
                   <div className="grid grid-cols-2 gap-2">
-                    <Input
-                      type="date"
+                    <DatePicker
                       value={
                         typeof tempFilters[col.accessorKey] === "object"
                           ? (tempFilters[col.accessorKey] as DateRangeFilterValue)
                               .from || ""
                           : ""
                       }
-                      onChange={(e) =>
+                      placeholder="From date"
+                      onChange={(value) =>
                         setTempFilters((f) => ({
                           ...f,
                           [col.accessorKey]: {
                             ...((typeof f[col.accessorKey] === "object"
                               ? f[col.accessorKey]
                               : {}) as DateRangeFilterValue),
-                            from: e.target.value,
+                            from: value,
                           },
                         }))
                       }
                     />
-                    <Input
-                      type="date"
+                    <DatePicker
                       value={
                         typeof tempFilters[col.accessorKey] === "object"
                           ? (tempFilters[col.accessorKey] as DateRangeFilterValue)
                               .to || ""
                           : ""
                       }
-                      onChange={(e) =>
+                      placeholder="To date"
+                      onChange={(value) =>
                         setTempFilters((f) => ({
                           ...f,
                           [col.accessorKey]: {
                             ...((typeof f[col.accessorKey] === "object"
                               ? f[col.accessorKey]
                               : {}) as DateRangeFilterValue),
-                            to: e.target.value,
+                            to: value,
                           },
                         }))
                       }

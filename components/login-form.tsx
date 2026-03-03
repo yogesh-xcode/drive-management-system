@@ -2,8 +2,15 @@
 
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-import { IconBrandGoogleFilled, IconBrandWindows } from "@tabler/icons-react";
-import { ArrowRight, Eye, EyeOff, Lock, Mail } from "lucide-react";
+import {
+  IconArrowRight,
+  IconBrandGoogleFilled,
+  IconBrandWindows,
+  IconEye,
+  IconEyeOff,
+  IconLock,
+  IconMail,
+} from "@/lib/icons";
 
 import Auth from "@/lib/auth/auth";
 import { supabase } from "@/lib/subabase";
@@ -134,7 +141,7 @@ export function LoginForm({
               Email Address
             </Label>
             <div className="flex items-center gap-2.5 rounded-lg border border-border bg-muted/45 px-2.5 py-1.5">
-              <Mail className="size-3.5 text-muted-foreground" />
+              <IconMail className="size-3.5 text-muted-foreground" />
               <Input
                 id="email"
                 type="email"
@@ -155,7 +162,7 @@ export function LoginForm({
               Password
             </Label>
             <div className="flex items-center gap-2.5 rounded-lg border border-border bg-muted/45 px-2.5 py-1.5">
-              <Lock className="size-3.5 text-muted-foreground" />
+              <IconLock className="size-3.5 text-muted-foreground" />
               <Input
                 id="password"
                 type={showPassword ? "text" : "password"}
@@ -172,9 +179,9 @@ export function LoginForm({
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
-                  <EyeOff className="size-3.5" />
+                  <IconEyeOff className="size-3.5" />
                 ) : (
-                  <Eye className="size-3.5" />
+                  <IconEye className="size-3.5" />
                 )}
               </button>
             </div>
@@ -205,10 +212,10 @@ export function LoginForm({
             className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2 text-xs font-bold text-primary-foreground shadow-md transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
           >
             Sign In to Dashboard
-            <ArrowRight className="size-3.5" />
+            <IconArrowRight className="size-3.5" />
           </button>
 
-          <div className="border-t border-border pt-2.5">
+          {/* <div className="border-t border-border pt-2.5">
             <p className="mb-2.5 text-center text-[11px] text-muted-foreground">
               Alternate sign-in options
             </p>
@@ -244,7 +251,7 @@ export function LoginForm({
                 Create one
               </button>
             </p>
-          </div>
+          </div> */}
         </form>
       ) : null}
 

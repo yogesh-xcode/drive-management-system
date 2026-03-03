@@ -1,5 +1,5 @@
 import { serviceMap } from "@/lib/repositories/services";
-import { Icon } from "@tabler/icons-react";
+import { Icon } from "@/lib/icons";
 import { ColumnDef } from "@tanstack/react-table";
 
 // 1. Base/Utility Types

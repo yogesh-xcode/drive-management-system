@@ -54,6 +54,6 @@ export const programColumns: ColumnDef<Client>[] = [
   },
   {
     accessorKey: "contact",
-    header: () => <div className="-ml-5">Contact</div>,
+    header: "Contact",
   },
 ];

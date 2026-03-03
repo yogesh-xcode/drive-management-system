@@ -1,7 +1,7 @@
 "use client";
 import { SidePeak } from "../SidePeak";
 import { Button } from "@/components/ui/button";
-import { IconPlus } from "@tabler/icons-react";
+import { IconPlus } from "@/lib/icons";
 import React from "react";
 import { JSX } from "react";
 
@@ -21,20 +21,36 @@ export const AddButton = React.forwardRef<
   { fields, onSubmit, children, open, onOpenChange }: AddButtonProps<T>,
   ref
 ) {
+  const isControlled = open !== undefined && !!onOpenChange;
+
   return (
-    <SidePeak<T>
-      side="right"
-      mode="create"
-      fields={fields}
-      onSubmit={onSubmit}
-      open={open}
-      onOpenChange={onOpenChange}
-    >
-      {/* This button acts as the default SheetTrigger if open is uncontrolled */}
-      <Button ref={ref} className="gap-1.5 text-sm" type="button">
-        <IconPlus /> {children}
-      </Button>
-    </SidePeak>
+    <>
+      {isControlled && (
+        <Button
+          ref={ref}
+          className="gap-1.5 text-sm"
+          type="button"
+          onClick={() => onOpenChange?.(true)}
+        >
+          <IconPlus /> {children}
+        </Button>
+      )}
+
+      <SidePeak<T>
+        side="right"
+        mode="create"
+        fields={fields}
+        onSubmit={onSubmit}
+        open={open}
+        onOpenChange={onOpenChange}
+      >
+        {!isControlled && (
+          <Button ref={ref} className="gap-1.5 text-sm" type="button">
+            <IconPlus /> {children}
+          </Button>
+        )}
+      </SidePeak>
+    </>
   );
 }) as <T extends Record<string, any>>(
   props: AddButtonProps<T> & { ref?: React.Ref<HTMLButtonElement> }
