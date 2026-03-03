@@ -99,16 +99,26 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarFooter className="mt-auto px-2 pb-3">
             <SidebarMenu className="gap-1">
               <SidebarMenuItem>
-                <SidebarMenuButton className="h-10 rounded-md px-3.5 text-[15px] text-muted-foreground hover:bg-muted/70 hover:text-foreground">
-                  <IconSettings className="size-[18px]" />
-                  <span>Settings</span>
-                </SidebarMenuButton>
+                <Link href="/account?tab=account">
+                  <SidebarMenuButton
+                    isActive={pathname.startsWith("/account")}
+                    className="h-10 rounded-md px-3.5 text-[15px] text-muted-foreground hover:bg-muted/70 hover:text-foreground data-[active=true]:bg-primary/12 data-[active=true]:text-primary"
+                  >
+                    <IconSettings className="size-[18px]" />
+                    <span>Settings</span>
+                  </SidebarMenuButton>
+                </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton className="h-10 rounded-md px-3.5 text-[15px] text-muted-foreground hover:bg-muted/70 hover:text-foreground">
-                  <IconHelpCircle className="size-[18px]" />
-                  <span>Support</span>
-                </SidebarMenuButton>
+                <Link href="/support">
+                  <SidebarMenuButton
+                    isActive={pathname.startsWith("/support")}
+                    className="h-10 rounded-md px-3.5 text-[15px] text-muted-foreground hover:bg-muted/70 hover:text-foreground data-[active=true]:bg-primary/12 data-[active=true]:text-primary"
+                  >
+                    <IconHelpCircle className="size-[18px]" />
+                    <span>Support</span>
+                  </SidebarMenuButton>
+                </Link>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarFooter>

@@ -55,6 +55,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   Table,
   TableBody,
   TableCell,
@@ -62,6 +69,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getEntityFilterConfig } from "@/lib/filter-config";
 import { serviceMap } from "@/lib/repositories/services";
 import { cn } from "@/lib/utils";
@@ -231,6 +239,41 @@ function formatPrintValue(type: ColumnMeta["type"], value: unknown): string {
   return String(value);
 }
 
+function isInteractiveTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  return Boolean(
+    target.closest(
+      "button,a,input,select,textarea,[role='button'],[role='menuitem'],[data-no-row-open='true']",
+    ),
+  );
+}
+
+function toDisplayText(value: unknown): string {
+  if (value === null || value === undefined) return "";
+  return String(value).trim();
+}
+
+function getInitials(value: string): string {
+  return value
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+}
+
+function firstNonEmptyValue(
+  row: Record<string, unknown>,
+  keys: string[],
+): string {
+  for (const key of keys) {
+    const value = toDisplayText(row[key]);
+    if (value) return value;
+  }
+  return "";
+}
+
 function buildColumnMeta<T extends Record<string, any>>(
   columns: ColumnDef<T>[],
   fields: FieldDef[],
@@ -390,6 +433,7 @@ export function PaginatedDataTable<T extends Record<string, any>>({
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [editRow, setEditRow] = useState<T | null>(null);
+  const [viewRow, setViewRow] = useState<T | null>(null);
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
@@ -606,6 +650,27 @@ export function PaginatedDataTable<T extends Record<string, any>>({
   });
 
   const rows = table.getRowModel().rows;
+  const paddedRows = useMemo(() => {
+    if (rows.length === 0) return [];
+
+    const entries = rows.map((row, index) => ({
+      row,
+      index,
+      placeholder: false,
+      key: row.id,
+    }));
+
+    for (let i = rows.length; i < rowsPerPage; i++) {
+      entries.push({
+        row: null,
+        index: i,
+        placeholder: true,
+        key: `placeholder-${i}`,
+      });
+    }
+
+    return entries;
+  }, [rows, rowsPerPage]);
   const pageCount = Math.max(1, table.getPageCount());
   const page = table.getState().pagination.pageIndex + 1;
   const selectedRows = table.getFilteredSelectedRowModel().rows;
@@ -771,17 +836,61 @@ export function PaginatedDataTable<T extends Record<string, any>>({
 
   const tableColCount =
     table.getVisibleLeafColumns().length + (hasActions ? 1 : 0) + 1;
+  const getCellTextAlignClass = (columnId: string, value: unknown) => {
+    if (
+      columnId === "department" &&
+      typeof value === "string" &&
+      value.trim().length > 0 &&
+      value.trim().length < 4
+    ) {
+      return "text-center";
+    }
+    return columnTypeById.get(columnId) === "text" ? "text-left" : "text-center";
+  };
 
   const printableColumns = useMemo(
     () => columnMeta.filter((col) => visibleIds.has(col.id)),
     [columnMeta, visibleIds],
   );
+  const viewRowRecord = viewRow as Record<string, unknown> | null;
+  const previewName = viewRowRecord
+    ? firstNonEmptyValue(viewRowRecord, ["fullName", "name"])
+    : "";
+  const previewSubtitle = viewRowRecord
+    ? firstNonEmptyValue(viewRowRecord, ["position", "department", "status"])
+    : "";
+  const previewAvatar = viewRowRecord
+    ? firstNonEmptyValue(viewRowRecord, [
+      "avatar",
+      "avatarUrl",
+      "image",
+      "photo",
+      "profileImage",
+      "profilePhoto",
+      "picture",
+    ])
+    : "";
+  const hasAvatarLayout = Boolean(previewName || previewAvatar);
 
   const handlePrint = () => {
     if (filteredData.length === 0) {
       setActionError("No rows available to print.");
       return;
     }
+
+    const rootStyles = getComputedStyle(document.documentElement);
+    const getCssVar = (name: string, fallback: string) => {
+      const value = rootStyles.getPropertyValue(name).trim();
+      return value || fallback;
+    };
+    const printTheme = {
+      foreground: getCssVar("--foreground", "#1f2937"),
+      background: getCssVar("--background", "#ffffff"),
+      mutedForeground: getCssVar("--muted-foreground", "#6b7280"),
+      border: getCssVar("--border", "#d1d5db"),
+      muted: getCssVar("--muted", "#f3f4f6"),
+      rowAlt: "color-mix(in oklch, var(--muted) 40%, var(--background) 60%)",
+    };
 
     const titleText = `${title} Report`;
     const printedAt = new Date().toLocaleString("en-GB");
@@ -812,8 +921,8 @@ export function PaginatedDataTable<T extends Record<string, any>>({
       body {
         margin: 0;
         font-family: "Segoe UI", Arial, sans-serif;
-        color: #1f2937;
-        background: #ffffff;
+        color: ${printTheme.foreground};
+        background: ${printTheme.background};
       }
       .watermark {
         position: fixed;
@@ -849,29 +958,29 @@ export function PaginatedDataTable<T extends Record<string, any>>({
         margin: 0;
       }
       .meta {
-        color: #6b7280;
+        color: ${printTheme.mutedForeground};
         font-size: 12px;
       }
       table {
         width: 100%;
         border-collapse: collapse;
-        border: 1px solid #d1d5db;
+        border: 1px solid ${printTheme.border};
         font-size: 12px;
       }
       thead th {
-        background: #f3f4f6;
+        background: ${printTheme.muted};
         text-align: left;
         font-weight: 700;
-        border: 1px solid #d1d5db;
+        border: 1px solid ${printTheme.border};
         padding: 8px;
       }
       tbody td {
-        border: 1px solid #e5e7eb;
+        border: 1px solid ${printTheme.border};
         padding: 7px 8px;
         vertical-align: top;
       }
       tbody tr:nth-child(even) td {
-        background: #fafafa;
+        background: ${printTheme.rowAlt};
       }
     </style>
   </head>
@@ -932,15 +1041,30 @@ export function PaginatedDataTable<T extends Record<string, any>>({
   return (
     <div className="ml-5.5 flex w-[95.5%] flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Input
-          placeholder="Search records..."
-          value={searchQuery}
-          onChange={(e) => {
-            void setSearchQuery(e.target.value);
-            void setPageQuery(1);
-          }}
-          className="h-9 w-full max-w-xs"
-        />
+        <div className="relative w-full max-w-xs">
+          <Input
+            placeholder="Search records..."
+            value={searchQuery}
+            onChange={(e) => {
+              void setSearchQuery(e.target.value);
+              void setPageQuery(1);
+            }}
+            className="h-9 w-full border-border/80 bg-muted/25 pr-9 hover:border-border"
+          />
+          {searchQuery.length > 0 && (
+            <button
+              type="button"
+              aria-label="Clear table search"
+              onClick={() => {
+                void setSearchQuery("");
+                void setPageQuery(1);
+              }}
+              className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2 -translate-y-1/2 rounded-sm p-0.5 transition-colors"
+            >
+              <IconX size={16} />
+            </button>
+          )}
+        </div>
 
         <div className="flex flex-wrap items-center gap-2">
           {(Object.keys(activeFilters).length > 0 || activePrimaryFilter) && (
@@ -963,9 +1087,9 @@ export function PaginatedDataTable<T extends Record<string, any>>({
                 setPendingFilters(activeFilters);
                 setPrimaryDraftColumn(
                   activePrimaryFilter?.columnId ??
-                    entityFilterConfig.primary.defaultColumn ??
-                    primaryFilterColumns[0]?.id ??
-                    "",
+                  entityFilterConfig.primary.defaultColumn ??
+                  primaryFilterColumns[0]?.id ??
+                  "",
                 );
                 setPrimaryDraftValue(
                   activePrimaryFilter?.criterion.value ?? "",
@@ -1329,6 +1453,80 @@ export function PaginatedDataTable<T extends Record<string, any>>({
         />
       )}
 
+      {viewRow && (
+        <Dialog open={!!viewRow} onOpenChange={(open) => !open && setViewRow(null)}>
+          <DialogContent
+            className={cn(
+              "top-1/2 left-4/7  max-h-[calc(100%-4rem)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto sm:max-w-3xl",
+              hasAvatarLayout && "sm:max-w-4xl lg:max-w-5xl",
+            )}
+          >
+            <DialogHeader>
+              <DialogTitle>{title} Details</DialogTitle>
+              <DialogDescription>
+                Read-only view of the selected row.
+              </DialogDescription>
+            </DialogHeader>
+            {hasAvatarLayout ? (
+              <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_320px] lg:grid-cols-[minmax(0,1fr)_360px]">
+                <div className="grid grid-cols-1 gap-3">
+                  {printableColumns.map((column) => (
+                    <div
+                      key={`view-${column.id}`}
+                      className="rounded-md border bg-muted/20 px-3 py-2.5"
+                    >
+                      <p className="text-muted-foreground text-xs">{column.label}</p>
+                      <p className="mt-1 break-words text-sm font-medium">
+                        {formatPrintValue(
+                          column.type,
+                          (viewRowRecord || {})[column.id],
+                        )}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                <div className="rounded-md border bg-muted/15 p-5">
+                  <p className="text-muted-foreground text-sm">Preview</p>
+                  <div className="mt-4 flex flex-col items-center text-center">
+                    <Avatar className="size-24 border">
+                      {previewAvatar ? <AvatarImage src={previewAvatar} alt={previewName} /> : null}
+                      <AvatarFallback className="text-lg font-semibold">
+                        {getInitials(previewName || "User")}
+                      </AvatarFallback>
+                    </Avatar>
+                    <p className="mt-4 text-xl font-semibold">
+                      {previewName || "Record"}
+                    </p>
+                    {previewSubtitle ? (
+                      <p className="text-muted-foreground mt-1 text-sm">
+                        {previewSubtitle}
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                {printableColumns.map((column) => (
+                  <div
+                    key={`view-${column.id}`}
+                    className="rounded-md border bg-muted/20 px-3 py-2"
+                  >
+                    <p className="text-muted-foreground text-xs">{column.label}</p>
+                    <p className="mt-1 break-words text-sm font-medium">
+                      {formatPrintValue(
+                        column.type,
+                        (viewRowRecord || {})[column.id],
+                      )}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+      )}
+
       <div className="w-full overflow-hidden rounded-md border-2">
         <Table>
           <TableHeader>
@@ -1414,46 +1612,79 @@ export function PaginatedDataTable<T extends Record<string, any>>({
                 </TableCell>
               </TableRow>
             ) : rows.length > 0 ? (
-              rows.map((row, index) => (
+              paddedRows.map(({ row, index, placeholder, key }) => (
                 <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() ? "selected" : undefined}
+                  key={key}
+                  data-state={
+                    !placeholder && row && row.getIsSelected()
+                      ? "selected"
+                      : undefined
+                  }
                   className={cn(
-                    index % 2 === 0
-                      ? "bg-background"
-                      : "bg-muted/35 hover:bg-muted/50",
+                    index % 2 === 0 ? "bg-background" : "bg-muted/35",
+                    !placeholder && "cursor-pointer hover:bg-muted/50",
+                    placeholder && "pointer-events-none",
                   )}
+                  onClick={(event) => {
+                    if (placeholder || !row) return;
+                    if (isInteractiveTarget(event.target)) return;
+                    setViewRow(row.original);
+                  }}
                 >
                   <TableCell className="w-10 text-center">
-                    <input
-                      type="checkbox"
-                      aria-label="Select row"
-                      checked={row.getIsSelected()}
-                      onChange={(e) => row.toggleSelected(e.target.checked)}
-                      className="size-4 accent-primary"
-                    />
+                    {placeholder ? (
+                      <input
+                        type="checkbox"
+                        aria-label="Placeholder row"
+                        checked={false}
+                        disabled
+                        className="size-4 accent-primary invisible"
+                      />
+                    ) : (
+                      row && (
+                        <input
+                          type="checkbox"
+                          aria-label="Select row"
+                          checked={row.getIsSelected()}
+                          onChange={(e) => row.toggleSelected(e.target.checked)}
+                          className="size-4 accent-primary"
+                        />
+                      )
+                    )}
                   </TableCell>
 
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className={cn(
-                        "px-4",
-                        columnTypeById.get(cell.column.id) === "text"
-                          ? "text-left"
-                          : "text-center",
-                      )}
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
+                  {placeholder || !row
+                    ? table.getVisibleLeafColumns().map((column) => (
+                      <TableCell
+                        key={`placeholder-${column.id}-${index}`}
+                        className={cn(
+                          "px-4",
+                          columnTypeById.get(column.id) === "text"
+                            ? "text-left"
+                            : "text-center",
+                        )}
+                      >
+                        {" "}
+                      </TableCell>
+                    ))
+                    : row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        key={cell.id}
+                        className={cn(
+                          "px-4",
+                          getCellTextAlignClass(cell.column.id, cell.getValue()),
+                        )}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </TableCell>
+                    ))}
 
                   {hasActions && (
                     <TableCell className="px-4 text-center">
-                      {onEdit && (
+                      {!placeholder && row && onEdit && (
                         <button
                           type="button"
                           onClick={() => setEditRow(row.original)}
@@ -1462,7 +1693,7 @@ export function PaginatedDataTable<T extends Record<string, any>>({
                           Edit
                         </button>
                       )}
-                      {onDelete && (
+                      {!placeholder && row && onDelete && (
                         <button
                           type="button"
                           onClick={async () => {
