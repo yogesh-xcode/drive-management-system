@@ -215,7 +215,7 @@ export function LoginForm({
             <IconArrowRight className="size-3.5" />
           </button>
 
-          <div className="border-t border-border pt-2.5">
+          {/* <div className="border-t border-border pt-2.5">
             <p className="mb-2.5 text-center text-[11px] text-muted-foreground">
               Alternate sign-in options
             </p>
@@ -251,7 +251,7 @@ export function LoginForm({
                 Create one
               </button>
             </p>
-          </div>
+          </div> */}
         </form>
       ) : null}
 
