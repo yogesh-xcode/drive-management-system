@@ -6,6 +6,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { Toaster } from "sonner";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const notoSerif = Noto_Serif({
   subsets: ["latin"],
@@ -34,6 +35,7 @@ export default function RootLayout({
           </SidebarProvider>
           <Toaster position="bottom-right" richColors />
         </NuqsAdapter>
+        <SpeedInsights />
       </body>
     </html>
   );
